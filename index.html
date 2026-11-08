@@ -111,7 +111,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
  <label>Wall material<select id="lp_mat"></select></label>
  <label>Gas transport<select id="lp_tr"><option value="cea">CEA mixture (table)</option><option value="approx">Huzel-Huang approx. (legacy)</option></select></label>
 </div></details>
-<div class="lact"><button id="lp_go" class="primary" type="button">Compute live design</button><button id="lp_tpl" type="button" title="Copy the selected design's inputs into this form so you can change the thrust, ambient, …">Use selected design as template</button><button id="lp_clear" type="button">Remove live designs</button><button id="lp_dl" type="button">Download selected design (JSON)</button><span id="lp_status"></span><span class="eng" id="lp_eng"></span></div>
+<div class="lact"><button id="lp_go" class="primary" type="button">Compute live design</button><button id="lp_tpl" type="button" title="Copy the selected design's inputs into this form so you can change the thrust, ambient, ...">Use selected design as template</button><button id="lp_clear" type="button">Remove live designs</button><button id="lp_dl" type="button">Download selected design (JSON)</button><span id="lp_status"></span><span class="eng" id="lp_eng"></span></div>
 <details class="ladv"><summary>Engine request (JSON)</summary><pre id="lp_json"></pre></details>
 <div style="margin-top:8px;font-size:11px;color:var(--mut)"><span class="chip L">LIVE</span>calculated from the inputs &nbsp; <span class="chip T">TABLE</span>CEA / CoolProp data generated offline and interpolated &nbsp; <span class="chip P">STORED</span>preset result &nbsp; <span class="chip A">INPUT</span>assumed value (c* efficiency, kinetic-loss fraction)</div>
 </details>
@@ -163,7 +163,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
 <section id="tab-cae" class="tab"><h2 class="tabtitle">Analysis workbench</h2>
 <p class="caelead">MOC nozzle, finite-rate kinetics, channel-wall FEA, feed-cycle balance, uncertainty/sensitivity and a V&amp;V test suite, all run on the case defined on the Case tab. Each run records an input hash, result hash and the assumed inputs.<span class="caewarn">Limitations: no hot-fire data was used for calibration. Results are for conceptual and preliminary design and are not a substitute for CFD or hardware qualification.</span></p>
 <div class="caenav" id="cae_nav">
- <button data-p="case" class="on">Case</button><button data-p="moc">Nozzle (MOC)</button><button data-p="fea">Wall FEA</button><button data-p="cyc">Cycle</button><button data-p="uq">Uncertainty</button><button data-p="vv">V&amp;V</button><button data-p="rep">Report</button>
+ <button data-p="case" class="on">Case</button><button data-p="comb">Combustor &amp; injector</button><button data-p="moc">Nozzle (MOC)</button><button data-p="fea">Wall FEA</button><button data-p="cyc">Cycle</button><button data-p="thr">Throttle</button><button data-p="flt">Ascent</button><button data-p="opt">Optimiser</button><button data-p="uq">Uncertainty</button><button data-p="geo">Geometry &amp; export</button><button data-p="trc">Traceability</button><button data-p="vv">V&amp;V</button><button data-p="rep">Report</button>
 </div>
 
 <div class="caepane on" id="cae_case">
@@ -198,6 +198,54 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
  </div>
  <div class="lact"><button class="primary" id="y_run" type="button">Compare cycles</button><span id="y_status" class="stat"></span></div><div id="y_out"></div></div>
 
+<div class="caepane" id="cae_comb"><p class="hint">Chamber volume, stay time and acoustic modes, plus element sizing for four injector types. Droplet sizes are rough empirical estimates; everything else follows from mass and momentum balance.</p>
+ <div class="lgrid">
+  <label>Injector family<select id="k_fam"><option value="shear-coaxial">Shear coaxial</option><option value="swirl">Swirl (centrifugal)</option><option value="pintle">Pintle</option><option value="unlike-doublet">Unlike doublet</option></select></label>
+  <label>Elements <small>blank = auto</small><input id="k_N" type="text" value=""></label>
+  <label>Injector dp / Pc <small>blank = engine default 0.20</small><input id="k_dp" type="text" value=""></label>
+  <label>Discharge coefficient Cd<input id="k_cd" type="text" value=""></label>
+  <label>Fuel at injector<select id="k_fs"><option value="auto">Auto (heated gas for CH4, H2)</option><option value="liquid">Liquid</option></select></label>
+ </div>
+ <div class="lact"><button class="primary" id="k_run" type="button">Size combustor and injector</button><span id="k_status" class="stat"></span></div><div id="k_out"></div></div>
+
+<div class="caepane" id="cae_thr"><p class="hint">Runs the same hardware at part load (throat and expansion ratio fixed, pressure and flow scaled) and shows where the nozzle separates and where the injector drops below the chugging limit.</p>
+ <div class="lact"><button class="primary" id="t_run" type="button">Run throttle sweep</button><span id="t_status" class="stat"></span></div><div id="t_out"></div></div>
+
+<div class="caepane" id="cae_flt"><p class="hint">Single-stage ascent with a gravity turn, the 1976 standard atmosphere and an assumed drag table. Reports the velocity losses and the burnout orbit. Meant as a quick sizing check, not a trajectory optimiser.</p>
+ <div class="lgrid">
+  <label>Engines<input id="a_n" type="text" value="9"></label>
+  <label>Lift-off mass [kg]<input id="a_m0" type="text" value="200000"></label>
+  <label>Payload [kg]<input id="a_pl" type="text" value="3000"></label>
+  <label>Burn time [s]<input id="a_tb" type="text" value="200"></label>
+  <label>Reference diameter [m]<input id="a_d" type="text" value="3.7"></label>
+  <label>Pitch-over speed [m/s]<input id="a_vk" type="text" value="60"></label>
+  <label>Pitch kick [deg] <small>ignored if a target is set</small><input id="a_k" type="text" value="0.8"></label>
+  <label>Target burnout flight-path angle [deg] <small>blank = use the kick</small><input id="a_tg" type="text" value="5"></label>
+  <label>Drag scale<input id="a_cd" type="text" value="1"></label>
+ </div>
+ <div class="lact"><button class="primary" id="a_run" type="button">Fly</button><span id="a_status" class="stat"></span></div><div id="a_out"></div></div>
+
+<div class="caepane" id="cae_opt"><p class="hint">Varies chamber pressure, expansion ratio and O/F around the case. Each point is a full design, so a run takes 20 to 60 s. Shows the trade between Isp and a shell-mass proxy within the wall-temperature and coolant-pressure-drop limits. The search is local, so the result may not be the global best.</p>
+ <div class="lgrid">
+  <label>Wall temperature limit [K]<input id="o_tw" type="text" value="800"></label>
+  <label>Coolant dp limit [bar] <small>blank = 0.4 Pc</small><input id="o_dp" type="text" value=""></label>
+  <label>Pc range [bar] <small>blank = 0.5x to 2x</small><input id="o_pl" type="text" value="" placeholder="min"><input id="o_ph" type="text" value="" placeholder="max" style="margin-top:4px"></label>
+  <label>Eps range <small>blank = 0.5x to 2.5x</small><input id="o_el" type="text" value="" placeholder="min"><input id="o_eh" type="text" value="" placeholder="max" style="margin-top:4px"></label>
+ </div>
+ <div class="lact"><button class="primary" id="o_run" type="button">Search</button><progress id="o_prog" value="0" max="1" hidden></progress><span id="o_status" class="stat"></span></div><div id="o_out"></div></div>
+
+<div class="caepane" id="cae_geo"><p class="hint">Revolved view of the chamber and contour export. The outer surface is the gas-side contour offset by one shell thickness (liner, channel depth, jacket). It has no manifolds, ports or channel layout. STEP is not written directly; run the CadQuery script to get one.</p>
+ <div class="lgrid">
+  <label>Contour points<input id="g_n" type="text" value="160"></label>
+  <label>Section<select id="g_sec"><option value="360">Full 360</option><option value="180" selected>Half 180</option><option value="90">Quarter 90</option></select></label>
+  <label>View<select id="g_view"><option value="iso">Isometric</option><option value="side">Side</option><option value="axial">Looking down the axis</option></select></label>
+ </div>
+ <div class="lact"><button class="primary" id="g_run" type="button">Build geometry</button><span id="g_status" class="stat"></span></div>
+ <div id="g_out"></div></div>
+
+<div class="caepane" id="cae_trc"><p class="hint">Where each headline number comes from: the relation, the source, what it depends on, and whether it is computed, read from a table or assumed. The run record above identifies the exact input and result.</p>
+ <div class="lact"><button class="primary" id="x_run" type="button">Show traceability</button><span id="x_status" class="stat"></span></div><div id="x_out"></div></div>
+
 <div class="caepane" id="cae_uq"><p class="hint">Latin-hypercube sampling of the full model, then a quadratic response surface (checked on hold-out runs) for Sobol indices. Input scatter is taken from typical literature ranges (listed below), not calibrated to test data.</p>
  <div class="lact"><label>Runs <input id="u_n" type="number" value="100" min="30" max="600" style="width:80px"></label><label>Wall limit [K] <input id="u_lim" type="number" value="800" style="width:80px"></label><button class="primary" id="u_run" type="button">Run</button><progress id="u_prog" value="0" max="1" hidden></progress><span id="u_status" class="stat"></span></div><div id="u_out"></div></div>
 
@@ -211,7 +259,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
 <section id="tab-verify" class="tab"><h2 class="tabtitle">Verification &amp; comparison with NASA CEA</h2>
 <div id="v"></div>
 </section>
-<div class="sfoot">Singularity-Max, engine v2.0</div>
+<div class="sfoot">Singularity-Max, engine v2.1</div>
 <script type="text/plain" id="engine-src">/* ============================================================================
  *  Singularity-Max  ·  computational engine  (pure JS, no DOM)          v1.0
  *  ----------------------------------------------------------------------------
@@ -235,7 +283,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
   const G0 = 9.80665,
     SB = 5.670374419e-8,
     RU = 8314.462618;
-  const VERSION = '2.0';
+  const VERSION = '2.1';
   let TH = null,
     CL = null,
     KT = null;
@@ -4440,7 +4488,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
 <script type="text/plain" id="engine-api">/* ============================================================================
- *  se_api.js - typed, unit-aware, versioned public API (v2.0)
+ *  se_api.js - typed, unit-aware, versioned public API (v2.1)
  *  Every call:   SEAPI.run(method, rawInput)  ->  Envelope
  *     rawInput may carry units as strings ("250 kN", "1450 psi", "20 C", "5 km")
  *     input is validated against SCHEMA (type / range / enum / unit dimension) and converted to canonical units
@@ -4747,6 +4795,10 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
     M.CYC = M.CYC || g.SE_CYCLE;
     M.UQ = M.UQ || g.SE_UQ;
     M.VV = M.VV || g.SE_VV;
+    M.COMB = M.COMB || g.SE_COMB;
+    M.FLT = M.FLT || g.SE_FLIGHT;
+    M.OPT = M.OPT || g.SE_OPT;
+    M.EXP = M.EXP || g.SE_EXPORT;
     return M;
   }
 
@@ -4824,7 +4876,12 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
       case 'moc':
       case 'fea':
       case 'cycle':
-      case 'uq': {
+      case 'uq':
+      case 'combustor':
+      case 'throttle':
+      case 'flight':
+      case 'optimize':
+      case 'geometry': {
         const v = validate(raw, 'engine');
         if (!v.ok) return fail(method, raw, v);
         let vc = null;
@@ -4853,6 +4910,14 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
             return m.CYC.analyze(e, vc.value);
           }
           if (method === 'uq') return m.UQ.run(input, opts.uq || {}, opts.onProgress);
+          if (method === 'combustor') return m.COMB.analyze(input, opts.comb || {});
+          if (method === 'throttle') return m.COMB.throttle(input, opts.throttle || {});
+          if (method === 'flight') {
+            if (!opts.flight) throw new Error('flight needs opts.flight: { n, m0, payload, t_burn, d_ref, ... }');
+            return m.FLT.run(m.SE, input, opts.flight, {});
+          }
+          if (method === 'optimize') return m.OPT.run(input, opts.opt || {}, opts.onProgress);
+          if (method === 'geometry') return m.EXP.files(m.SE.design(input), opts.geometry || {});
         });
         env.diagnostics.warnings = v.warnings.concat(env.diagnostics.warnings);
         return env;
@@ -4964,7 +5029,7 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
  * ========================================================================== */
 (function (root) {
   'use strict';
-  const M = { SE: null, MOC: null, FEA: null, CYC: null, UQ: null, API: null };
+  const M = { SE: null, MOC: null, FEA: null, CYC: null, UQ: null, API: null, COMB: null, FLT: null, OPT: null, EXP: null };
   function bind(mods) {
     Object.assign(M, mods);
   }
@@ -4976,6 +5041,10 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
     M.CYC = M.CYC || g.SE_CYCLE;
     M.UQ = M.UQ || g.SE_UQ;
     M.API = M.API || g.SEAPI;
+    M.COMB = M.COMB || g.SE_COMB;
+    M.FLT = M.FLT || g.SE_FLIGHT;
+    M.OPT = M.OPT || g.SE_OPT;
+    M.EXP = M.EXP || g.SE_EXPORT;
     return M;
   };
   const TOLERANCE_POLICY =
@@ -5622,6 +5691,84 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
       });
     }
 
+    /* ---------------- VERIFICATION 7: combustor, injector, throttle ---------------- */
+    section = 'COMB';
+    const CASE = { propellant: 'LOX/LCH4', thrust: 250000, pc: 100, of: 3.2, ambient: { mode: 'sealevel' } };
+    if (m.COMB)
+      guard('comb', () => {
+        const r = m.COMB.analyze(CASE, {}),
+          e = SE.design(CASE),
+          p = e.perf;
+        chk('Chamber volume integrated from the contour reproduces L* (design)', r.combustor.Lstar_contour_m, p.Lstar, 2e-3, { source: 'definition V = L* At' });
+        const inj = r.families['shear-coaxial'].detail,
+          tp = inj.post_wall_mm / 1e3,
+          dO = inj.ox_post_id_mm / 1e3,
+          Do = inj.element_od_mm / 1e3,
+          N = inj.n_elements;
+        chk('Shear-coaxial: oxidiser flow closes (N x post area x rho x v = mdot)', (N * (Math.PI / 4) * dO * dO * inj.ox.rho * inj.ox.v) / p.mdot_ox, 1, 1e-9, { source: 'mass conservation' });
+        chk('Shear-coaxial: fuel annulus flow closes', (N * (Math.PI / 4) * (Do * Do - Math.pow(dO + 2 * tp, 2)) * inj.fuel.rho * inj.fuel.v) / p.mdot_fuel, 1, 1e-9, { source: 'mass conservation' });
+        const sw = r.families['swirl'].detail;
+        chk('Swirl: oxidiser orifice flow closes', (sw.n_elements * (Math.PI / 4) * Math.pow(sw.ox_orifice_d_mm / 1e3, 2) * sw.ox.rho * sw.ox.v) / p.mdot_ox, 1, 1e-9, { source: 'mass conservation' });
+        const pt = r.families['pintle'].detail;
+        chk('Pintle: fuel gap flow closes', (Math.PI * (pt.pintle_D_mm / 1e3) * (pt.fuel_gap_mm / 1e3) * pt.fuel.rho * pt.fuel.v) / p.mdot_fuel, 1, 1e-9, { source: 'mass conservation' });
+        const th = m.COMB.throttle(CASE, { levels: [1, 0.5] });
+        chk('Throttle 100 % row reproduces the design Isp', th.rows[0].isp_s, p.isp_delivered, 1e-9);
+        chk('Throttle 100 % row keeps the throat area', th.rows[0].At_mismatch_pct, 0, 1e-9);
+        chk('Injector dp/Pc at 50 % throttle is about half the design value (dp ~ flow^2, Pc ~ flow)', th.rows[1].dp_over_pc, 0.5 * (e.inj.dp / CASE.pc), 0.02, { source: 'fixed-orifice scaling' });
+      });
+
+    /* ---------------- VERIFICATION 8: flight model ---------------- */
+    section = 'FLT';
+    if (m.FLT)
+      guard('flight', () => {
+        const F = m.FLT;
+        const eng = { F_vac: 300000, Ae: 0.2, mdot: 100 };
+        const tsi = F.simulate(eng, { n: 1, m0: 20000, payload: 500, t_burn: 100, d_ref: 2, kick_deg: 0 }, { no_atmosphere: true, no_gravity: true });
+        chk('Rocket equation: no gravity, no atmosphere, dV = ve ln(m0/mb)', tsi.budget.net_inertial_speed, (300000 / 100) * Math.log(2), 1e-6, { source: 'Tsiolkovsky' });
+        const hG = (H) => (H * 6356766) / (6356766 - H);
+        chk('1976 atmosphere: pressure at 11 km geopotential [Pa]', F.atmosphere(hG(11000)).p, 22632.06, 1e-5 / 22.6, { source: 'U.S. Standard Atmosphere 1976' });
+        chk('1976 atmosphere: pressure at 20 km geopotential [Pa]', F.atmosphere(hG(20000)).p, 5474.89, 1e-4 / 5.5, { source: 'U.S. Standard Atmosphere 1976' });
+        chk('1976 atmosphere: density at sea level [kg/m3]', F.atmosphere(0).rho, 1.225, 1e-4, { source: 'U.S. Standard Atmosphere 1976' });
+        const r = F.run(SE, CASE, { n: 9, m0: 200000, payload: 3000, t_burn: 120, d_ref: 3.7, kick_deg: 0.8 }, { dt: 0.1 });
+        chk('Velocity budget closes: dV_vac - back-pressure - gravity - drag = inertial speed (residual / dV_vac)', r.budget.closure_residual_pct / 100, 0, 1e-4);
+      });
+
+    /* ---------------- VERIFICATION 9: optimiser ---------------- */
+    section = 'OPT';
+    if (m.OPT)
+      guard('opt', () => {
+        const o = m.OPT.run(Object.assign({}, CASE, { ambient: { mode: 'vacuum' } }), { n_pc: 4, n_eps: 3, n_of: 1, refine: false, Twg_limit_K: 1000 });
+        let dom = 0;
+        o.pareto.forEach((a) => {
+          if (o.pareto.some((b) => b !== a && b.isp >= a.isp && b.mass <= a.mass && (b.isp > a.isp || b.mass < a.mass))) dom++;
+        });
+        chk('Pareto front contains no dominated point', dom, 0, 0);
+        chk('Pareto front has at least 2 points', o.pareto.length >= 2 ? 1 : 0, 1, 0);
+        chk('Every Pareto point satisfies the wall-temperature limit', o.pareto.every((p) => p.Twg <= 1000) ? 1 : 0, 1, 0);
+      });
+
+    /* ---------------- VERIFICATION 10: geometry export ---------------- */
+    section = 'EXP';
+    if (m.EXP)
+      guard('export', () => {
+        const X = m.EXP,
+          e = SE.design(CASE);
+        const st = X.stl(e, {});
+        const ec = X.edgeCheck(st.bytes);
+        chk('STL is a closed surface (every edge shared by exactly two triangles): open edges', ec.bad_edges, 0, 0);
+        const c = X.contour(e, 120),
+          t = st.thickness_mm;
+        let V = 0;
+        for (let i = 1; i < c.length; i++) {
+          const ri = (c[i][1] + c[i - 1][1]) / 2;
+          V += Math.PI * (Math.pow(ri + t, 2) - ri * ri) * (c[i][0] - c[i - 1][0]);
+        }
+        chk('STL enclosed volume matches the analytic revolved-shell volume', X.meshVolume(st.bytes) / V, 1, 5e-3, { source: 'Pappus / slab integration' });
+        chk('Exported contour contains the throat radius', Math.min.apply(null, c.map((q) => q[1])) / (e.perf.Dt * 500), 1, 2e-3);
+        const rows = X.csv(e, 120).trim().split('\n').length - 1;
+        chk('CSV row count equals the requested sample count', rows, 120, 0);
+      });
+
     /* ---------------- VALIDATION against published engine data ---------------- */
     section = 'VAL';
     const PUB = [
@@ -5820,6 +5967,1018 @@ nav button:hover{border-color:var(--cu);color:var(--fg)}nav button.on{color:#0a0
   else root.SE_VV = API;
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script type="text/plain" id="engine-comb">// Combustor, injector and throttle calculations on top of a finished SE.design() result.
+// Chamber volume comes from the contour, injector sizing from mass and momentum balance.
+// Droplet sizes use empirical correlations and are rough. Nothing here is fitted to test data.
+// Values are tagged INPUT, ASSUMED (a default picked here) or computed.
+(function (root) {
+  'use strict';
+  const RU = 8314.462618;
+  let SEref = null;
+  function bind(SE) {
+    SEref = SE;
+  }
+  function SE_() {
+    SEref =
+      SEref || (typeof require !== 'undefined' ? require('./singularity_engine.js') : root.SE);
+    return SEref;
+  }
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const PI = Math.PI;
+
+  /* liquid properties used for atomisation estimates (at typical injection temperatures) */
+  const LIQ = {
+    'LOX': { sigma: 0.0132, mu: 1.95e-4 }, // 90 K
+    'RP-1': { sigma: 0.0260, mu: 1.6e-3 },
+    'LCH4': { sigma: 0.0139, mu: 1.2e-4 }, // 111 K
+    'LH2': { sigma: 0.0019, mu: 1.3e-5 }, // 20 K
+    'Ethanol': { sigma: 0.0225, mu: 1.2e-3 },
+    'Propane': { sigma: 0.0165, mu: 2.0e-4 },
+  };
+  const FUEL_OF = {
+    'LOX/LH2': 'LH2',
+    'LOX/LCH4': 'LCH4',
+    'LOX/RP-1': 'RP-1',
+    'LOX/Ethanol': 'Ethanol',
+    'LOX/Propane': 'Propane',
+  };
+  const FUEL_M = { LH2: 2.016, LCH4: 16.043 }; // molar mass for the heated-gas option
+  const FAMILIES = ['shear-coaxial', 'swirl', 'pintle', 'unlike-doublet'];
+
+  function chamberGas(e, prop) {
+    const SE = SE_(),
+      p = e.perf;
+    let g = 1.2;
+    try {
+      g = SE.performance(prop, p.of, p.pc, p.eps).gamma_c || 1.2;
+    } catch (err) {
+      /* keep the default */
+    }
+    const Mw = p.Mc,
+      Rg = RU / Mw,
+      c = Math.sqrt(g * Rg * p.Tc);
+    return { gamma: g, Mw, Rg, c, rho: (p.pc * 1e5) / (Rg * p.Tc) };
+  }
+
+  /* volume of the chamber (injector face to throat) integrated from the real contour (mm) */
+  function contourVolume(e) {
+    const x = e.c.x,
+      r = e.c.r;
+    let V = 0,
+      Lc = 0;
+    for (let i = 1; i < x.length; i++) {
+      if (x[i] > 0) break;
+      const dx = (x[i] - x[i - 1]) / 1000,
+        rm = (r[i] + r[i - 1]) / 2000;
+      V += PI * rm * rm * dx;
+      Lc = -x[0] / 1000;
+    }
+    return { V, L: Lc };
+  }
+
+  function combustor(e, prop) {
+    const p = e.perf,
+      gas = chamberGas(e, prop),
+      cv = contourVolume(e),
+      At = p.At,
+      Vtarget = p.Lstar * At;
+    const tau = (gas.rho * Vtarget) / p.mdot;
+    const Dc = p.Dc,
+      Lc = cv.L;
+    return {
+      Dt_m: p.Dt,
+      Dc_m: Dc,
+      contraction_ratio: p.Ac_At,
+      barrel_length_m: p.Lcyl,
+      chamber_length_m: Lc,
+      Lstar_design_m: p.Lstar,
+      volume_design_m3: Vtarget,
+      volume_contour_m3: cv.V,
+      Lstar_contour_m: cv.V / At,
+      stay_time_ms: tau * 1e3,
+      chamber_gas: { gamma: gas.gamma, Mw: gas.Mw, rho: gas.rho, sound_speed: gas.c },
+      acoustic: {
+        f_1T_Hz: (1.8412 * gas.c) / (PI * Dc),
+        f_1R_Hz: (3.8317 * gas.c) / (PI * Dc),
+        f_1L_Hz: gas.c / (2 * Lc),
+        note: 'Hard-wall cylinder modes with no damping or baffles. 1L uses the full chamber length to the throat. 1T is the mode most often tied to combustion instability.',
+      },
+    };
+  }
+
+  /* gas-fuel density at injection for fuels that leave the cooling jacket as a dense gas */
+  function fuelState(e, prop, mode) {
+    const fk = FUEL_OF[prop],
+      p = e.perf,
+      inj = e.inj;
+    const rhoLiq = p.mdot_fuel / (inj.A_fuel * inj.v_fuel);
+    if (mode === 'liquid' || !FUEL_M[fk]) return { state: 'liquid', rho: rhoLiq, T: null };
+    const T = p.T_cool_out,
+      P = e.inp.pc * 1e5 * 1.2,
+      Z = 0.9,
+      rho = (P * FUEL_M[fk]) / (Z * RU * T);
+    return { state: 'heated gas (Z=0.9, ideal-gas density)', rho, T, P };
+  }
+
+  /* Sauter mean diameter of a liquid jet in a co-flowing gas: Lorenzetto-Lefebvre plain-jet
+     air-blast form as usually quoted (not re-derived here), ESTIMATE only. */
+  function smdCoax(dj, sigma, mu, rhoL, rhoG, uRel, alr) {
+    const We = (rhoG * uRel * uRel * dj) / sigma,
+      Oh = mu / Math.sqrt(sigma * rhoL * dj),
+      f = 1 + 1 / alr;
+    return dj * (0.48 * Math.pow(We, -0.4) * f + 0.15 * Oh * f);
+  }
+  /* pressure-swirl atomiser, Lefebvre (1989) form, SI units, ESTIMATE only */
+  function smdSwirl(sigma, mu, mdot, dP, rhoA) {
+    return 2.25 * Math.pow(sigma, 0.25) * Math.pow(mu, 0.25) * Math.pow(mdot, 0.25) * Math.pow(dP, -0.5) * Math.pow(rhoA, -0.25);
+  }
+
+  function injector(e, prop, o) {
+    o = o || {};
+    const p = e.perf,
+      inj = e.inj,
+      gas = chamberGas(e, prop);
+    const fam = o.family || 'shear-coaxial';
+    if (FAMILIES.indexOf(fam) < 0) throw new Error('unknown injector family: ' + fam);
+    const dpFrac = o.dp_frac != null ? +o.dp_frac : inj.dp / e.inp.pc;
+    const dP = dpFrac * e.inp.pc * 1e5;
+    const Cd = o.Cd != null ? +o.Cd : inj.Cd;
+    const rhoO = p.mdot_ox / (inj.A_ox * inj.v_ox);
+    const fs = fuelState(e, prop, o.fuel_state || 'auto');
+    const rhoF = fs.rho;
+    const vO = Cd * Math.sqrt((2 * dP) / rhoO),
+      vF = Cd * Math.sqrt((2 * dP) / rhoF);
+    const AO = p.mdot_ox / (rhoO * vO),
+      AF = p.mdot_fuel / (rhoF * vF);
+    const liqO = LIQ.LOX,
+      fk = FUEL_OF[prop];
+    const out = {
+      family: fam,
+      dp_bar: dP / 1e5,
+      dp_over_pc: dpFrac,
+      chugging: {
+        margin: dpFrac - 0.15,
+        ok: dpFrac >= 0.15,
+        note: 'dp/Pc >= 15 % is the SP-194 rule of thumb for decoupling the feed system from chamber pressure oscillations.',
+      },
+      ox: { rho: rhoO, v: vO, A_total_m2: AO },
+      fuel: { state: fs.state, rho: rhoF, v: vF, A_total_m2: AF, T_K: fs.T },
+      assumptions: {
+        Cd: { value: Cd, status: o.Cd != null ? 'INPUT' : 'ASSUMED (engine default)' },
+        dp_over_pc: { value: dpFrac, status: o.dp_frac != null ? 'INPUT' : 'ASSUMED (engine default)' },
+        fuel_state: { value: fs.state, status: 'ASSUMED' },
+      },
+      warnings: [],
+    };
+    const ex = Math.max(1, Math.round(o.N || 0));
+    const faceA = (PI / 4) * Math.pow(p.Dc, 2) * 0.85; // 85 % of chamber area usable for elements
+    if (fam === 'shear-coaxial') {
+      const dPost = o.post_d_mm ? o.post_d_mm / 1000 : 0.0045,
+        tPost = 0.0005,
+        Aone = (PI / 4) * dPost * dPost;
+      let N = o.N ? ex : Math.max(7, Math.round(AO / Aone));
+      const dO = Math.sqrt((4 * AO) / N / PI),
+        AFper = AF / N,
+        Dout = Math.sqrt((4 * AFper) / PI + Math.pow(dO + 2 * tPost, 2)),
+        gap = (Dout - dO - 2 * tPost) / 2,
+        pitch = Math.sqrt(faceA / N);
+      const uO = vO,
+        uF = vF,
+        J = (rhoF * uF * uF) / (rhoO * uO * uO),
+        alr = p.mdot_fuel / p.mdot_ox,
+        liqF = LIQ[fk] || LIQ.LCH4;
+      const smd = smdCoax(dO, liqO.sigma, liqO.mu, rhoO, rhoF, Math.abs(uF - uO), alr);
+      Object.assign(out, {
+        n_elements: N,
+        ox_post_id_mm: dO * 1e3,
+        post_wall_mm: tPost * 1e3,
+        fuel_annulus_gap_mm: gap * 1e3,
+        element_od_mm: Dout * 1e3,
+        pitch_mm: pitch * 1e3,
+        momentum_flux_ratio_J: J,
+        J_window: [2, 20],
+        J_in_window: J >= 2 && J <= 20,
+        smd_um: smd * 1e6,
+        smd_basis: 'ESTIMATE: plain-jet air-blast form (Lorenzetto-Lefebvre) with the fuel stream as the gas; valid for gaseous fuel, indicative for liquid fuel.',
+      });
+      if (!(gap > 0.0002)) out.warnings.push('Fuel annulus gap below 0.2 mm: not manufacturable; lower dp or use fewer, larger elements.');
+      if (Dout * 1.6 > pitch) out.warnings.push('Element outer diameter is more than 62 % of the pitch: faceplate is crowded, so use fewer elements or a larger post.');
+      if (J < 2) out.warnings.push('Momentum flux ratio below 2: weak shear, expect poor mixing unless fuel dp is raised.');
+    } else if (fam === 'swirl') {
+      const Cds = o.Cd != null ? +o.Cd : 0.4, // swirl orifices pass less than plain orifices
+        vs = Cds * Math.sqrt((2 * dP) / rhoO);
+      const AOs = p.mdot_ox / (rhoO * vs);
+      let N = o.N ? ex : Math.max(7, Math.round(AOs / ((PI / 4) * 0.0016 * 0.0016)));
+      const dOr = Math.sqrt((4 * AOs) / N / PI),
+        mEl = p.mdot_ox / N;
+      const smd = smdSwirl(liqO.sigma, liqO.mu, mEl, dP, gas.rho);
+      Object.assign(out, {
+        n_elements: N,
+        ox_orifice_d_mm: dOr * 1e3,
+        mdot_per_element_kg_s: mEl,
+        pitch_mm: Math.sqrt(faceA / N) * 1e3,
+        smd_um: smd * 1e6,
+        smd_basis: 'ESTIMATE: Lefebvre pressure-swirl correlation, SI form.',
+      });
+      out.assumptions.Cd_swirl = { value: Cds, status: o.Cd != null ? 'INPUT' : 'ASSUMED (swirl orifices run at lower Cd)' };
+      out.ox.v = vs;
+      out.ox.A_total_m2 = AOs;
+      out.warnings.push('Swirl element geometry (swirl chamber, slot count) is not sized here: only orifice diameter and flow split.');
+    } else if (fam === 'pintle') {
+      const Dp = (o.pintle_D_over_Dc != null ? +o.pintle_D_over_Dc : 0.35) * p.Dc,
+        BF = o.blockage != null ? +o.blockage : 0.6;
+      const dH = (4 * AO) / (BF * PI * PI * Dp),
+        Nh = Math.max(4, Math.round((BF * PI * Dp) / dH)),
+        dH2 = Math.sqrt((4 * AO) / (Nh * PI)),
+        delta = AF / (PI * Dp),
+        TMR = (p.mdot_fuel * vF) / (p.mdot_ox * vO);
+      Object.assign(out, {
+        n_elements: 1,
+        pintle_D_mm: Dp * 1e3,
+        ox_radial_holes: Nh,
+        ox_hole_d_mm: dH2 * 1e3,
+        blockage_factor: Nh * dH2 / (PI * Dp),
+        fuel_gap_mm: delta * 1e3,
+        total_momentum_ratio: TMR,
+        smd_um: null,
+        smd_basis: 'Not estimated for pintle injectors (no correlation included).',
+      });
+      out.assumptions.pintle_D_over_Dc = { value: Dp / p.Dc, status: o.pintle_D_over_Dc != null ? 'INPUT' : 'ASSUMED' };
+      out.assumptions.blockage_factor = { value: BF, status: o.blockage != null ? 'INPUT' : 'ASSUMED (0.5-0.7 is typical)' };
+      if (delta < 0.0003) out.warnings.push('Fuel gap under 0.3 mm: tolerance-sensitive, so raise the pintle diameter or use a lower dp.');
+      if (TMR < 0.5 || TMR > 2) out.warnings.push('Total momentum ratio is outside 0.5-2: spray cone will bend toward the wall or the pintle.');
+    } else {
+      let N = o.N ? ex : Math.max(7, Math.round(AO / ((PI / 4) * 0.0012 * 0.0012)));
+      const dO = Math.sqrt((4 * AO) / N / PI),
+        dF = Math.sqrt((4 * AF) / N / PI),
+        Mr = (p.mdot_fuel * vF) / (p.mdot_ox * vO);
+      Object.assign(out, {
+        n_elements: N,
+        ox_jet_d_mm: dO * 1e3,
+        fuel_jet_d_mm: dF * 1e3,
+        pitch_mm: Math.sqrt(faceA / N) * 1e3,
+        jet_momentum_ratio: Mr,
+        smd_um: null,
+        smd_basis: 'Not estimated for impinging jets (no correlation included).',
+      });
+      out.warnings.push('Doublet pair: one oxidiser jet and one fuel jet per element. Impingement angle and Rupe mixing factor are not computed.');
+    }
+    return out;
+  }
+
+  /* throttle sweep: same nozzle (A_t and eps fixed), chamber pressure and flow scaled */
+  function throttle(input, opts) {
+    const SE = SE_();
+    opts = opts || {};
+    const e0 = SE.design(input),
+      p0 = e0.perf;
+    const levels = opts.levels || [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4];
+    const rows = [];
+    levels.forEach((t) => {
+      try {
+        const inp = Object.assign({}, input, {
+          thrust: input.thrust * t,
+          pc: input.pc * t,
+          eps: p0.eps,
+        });
+        const e = SE.design(inp),
+          q = e.perf;
+        const s = p0.At / q.At; // rescale so that the throat area equals the original hardware
+        const F = input.thrust * t * s,
+          md = q.mdot * s,
+          pcA = input.pc * t,
+          pe = q.Pe,
+          pa = e.inp.pa_bar;
+        const dpScale = Math.pow(md / p0.mdot, 2) * e0.inj.dp / pcA / 1; // dp ~ mdot^2 for fixed orifice areas
+        rows.push({
+          throttle: t,
+          pc_bar: pcA,
+          thrust_N: F,
+          mdot_kg_s: md,
+          isp_s: q.isp_delivered,
+          pe_bar: pe,
+          pe_over_pa: pa > 0 ? pe / pa : null,
+          separation: pa > 0 && pe < 0.4 * pa,
+          dp_inj_bar: e0.inj.dp * Math.pow(md / p0.mdot, 2),
+          dp_over_pc: dpScale,
+          chugging_ok: dpScale >= 0.15,
+          Twg_max_K: q.Twg_max,
+          At_mismatch_pct: 100 * (s - 1),
+        });
+      } catch (err) {
+        rows.push({ throttle: t, error: String(err.message || err) });
+      }
+    });
+    return {
+      rows,
+      basis:
+        'Each level is a separate design with pc and thrust scaled by the throttle and the expansion ratio held, then rescaled to the original throat area. Injector dp is taken to scale with flow squared. c* efficiency and kinetics are not recomputed for part load.',
+      limits: {
+        summerfield: 'Separation flagged when Pe < 0.4 Pa (Summerfield criterion, as used by the base engine).',
+        chugging: 'dp/Pc below 0.15 flagged (NASA SP-194 rule of thumb).',
+      },
+    };
+  }
+
+  function analyze(input, opts) {
+    const SE = SE_();
+    opts = opts || {};
+    const e = SE.design(input),
+      prop = e.provenance.input.propellant;
+    const out = {
+      combustor: combustor(e, prop),
+      injector: injector(e, prop, opts.injector || {}),
+      families: {},
+    };
+    FAMILIES.forEach((f) => {
+      try {
+        const r = injector(e, prop, Object.assign({}, opts.injector || {}, { family: f }));
+        out.families[f] = {
+          n: r.n_elements,
+          smd_um: r.smd_um,
+          chugging_ok: r.chugging.ok,
+          warnings: r.warnings.length,
+          detail: r,
+        };
+      } catch (err) {
+        out.families[f] = { error: String(err.message || err) };
+      }
+    });
+    return out;
+  }
+
+  const API = { bind, analyze, combustor, injector, throttle, FAMILIES, contourVolume };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  else root.SE_COMB = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script type="text/plain" id="engine-flight">// Single-stage ascent: point mass, round non-rotating Earth, vertical rise, then a gravity turn
+// at zero angle of attack. F = F_vac - pa(h) * Ae, drag from a Mach-dependent Cd table, RK4 steps.
+// The velocity budget closes by construction:
+//   v = dV_vac - dV_backpressure - dV_gravity - dV_drag
+// and the leftover is returned as a check. No Earth rotation, wind, staging or guidance.
+(function (root) {
+  'use strict';
+  const G0 = 9.80665,
+    MU = 3.986004418e14,
+    RE = 6371000;
+  const PI = Math.PI;
+
+  /* U.S. Standard Atmosphere 1976, geopotential layers to 86 km; exponential tail above */
+  const LAYERS = [
+    [0, 288.15, -0.0065],
+    [11000, 216.65, 0],
+    [20000, 216.65, 0.001],
+    [32000, 228.65, 0.0028],
+    [47000, 270.65, 0],
+    [51000, 270.65, -0.0028],
+    [71000, 214.65, -0.002],
+  ];
+  const BASEP = [];
+  (function init() {
+    let P = 101325;
+    for (let i = 0; i < LAYERS.length; i++) {
+      BASEP.push(P);
+      if (i < LAYERS.length - 1) {
+        const [h0, T0, L] = LAYERS[i],
+          dh = LAYERS[i + 1][0] - h0;
+        P =
+          L === 0
+            ? P * Math.exp((-9.80665 * dh) / (287.053 * T0))
+            : P * Math.pow((T0 + L * dh) / T0, -9.80665 / (287.053 * L));
+      }
+    }
+  })();
+  function atmosphere(hGeom) {
+    const hg = hGeom < 0 ? 0 : hGeom,
+      H = (6356766 * hg) / (6356766 + hg);
+    if (H > 86000) {
+      const ref = atmosphere(84000),
+        k = Math.exp(-(H - 84000) / 6500);
+      return { T: ref.T, p: ref.p * k, rho: ref.rho * k, a: ref.a };
+    }
+    let i = LAYERS.length - 1;
+    while (i > 0 && H < LAYERS[i][0]) i--;
+    const [h0, T0, L] = LAYERS[i],
+      dh = H - h0,
+      T = T0 + L * dh;
+    const p =
+      L === 0
+        ? BASEP[i] * Math.exp((-9.80665 * dh) / (287.053 * T0))
+        : BASEP[i] * Math.pow(T / T0, -9.80665 / (287.053 * L));
+    return { T, p, rho: p / (287.053 * T), a: Math.sqrt(1.4 * 287.053 * T) };
+  }
+
+  /* drag coefficient of a slender launch vehicle vs Mach (ASSUMED, scaled by opts.cd_scale) */
+  const CD = [
+    [0, 0.3],
+    [0.8, 0.32],
+    [1.0, 0.55],
+    [1.3, 0.5],
+    [2, 0.42],
+    [3, 0.32],
+    [5, 0.25],
+    [10, 0.2],
+  ];
+  function cdOf(M) {
+    if (M <= CD[0][0]) return CD[0][1];
+    for (let i = 1; i < CD.length; i++)
+      if (M <= CD[i][0]) {
+        const a = (M - CD[i - 1][0]) / (CD[i][0] - CD[i - 1][0]);
+        return CD[i - 1][1] * (1 - a) + CD[i][1] * a;
+      }
+    return CD[CD.length - 1][1];
+  }
+
+  /* engine: { F_vac, Ae, mdot } per engine; veh: { n, m0, payload, t_burn, d_ref, ... } */
+  function simulate(engine, veh, o) {
+    o = o || {};
+    const n = veh.n || 1,
+      Fvac = engine.F_vac * n,
+      Ae = engine.Ae * n,
+      md = engine.mdot * n,
+      m0 = veh.m0,
+      tb = veh.t_burn,
+      mb = m0 - md * tb;
+    const noAtm = !!o.no_atmosphere,
+      noGrav = !!o.no_gravity;
+    const Aref = (PI / 4) * Math.pow(veh.d_ref || 3, 2),
+      cdS = veh.cd_scale != null ? veh.cd_scale : 1;
+    const vKick = veh.kick_speed != null ? veh.kick_speed : 60,
+      kick = ((veh.kick_deg != null ? veh.kick_deg : 0.8) * PI) / 180,
+      dt = o.dt || 0.05;
+    const warnings = [];
+    if (mb <= 0) throw new Error('propellant mass exceeds liftoff mass');
+    if (mb <= veh.payload) warnings.push('Burnout mass is below payload mass: no structure mass is left. Lower the burn time or raise the liftoff mass.');
+    const sl = noAtm ? { p: 0, rho: 0 } : atmosphere(0);
+    const thrust0 = Fvac - sl.p * Ae;
+    if (!noGrav && thrust0 <= m0 * G0) throw new Error('thrust-to-weight at lift-off is ' + (thrust0 / (m0 * G0)).toFixed(2) + ' (< 1): the vehicle cannot leave the pad');
+
+    // state: h, v, gamma, x ; mass is analytic
+    const gOf = (h) => (noGrav ? 0 : MU / Math.pow(RE + h, 2));
+    function rates(t, s, kicked) {
+      const h = s[0],
+        v = s[1],
+        g = s[2],
+        m = m0 - md * t,
+        at = noAtm ? { p: 0, rho: 0, a: 340 } : atmosphere(h);
+      const F = Fvac - at.p * Ae,
+        M = v / at.a,
+        D = noAtm ? 0 : 0.5 * at.rho * v * v * Aref * cdOf(M) * cdS,
+        gr = gOf(h);
+      const dv = (F - D) / m - gr * Math.sin(g);
+      let dg = 0;
+      if (kicked && v > 1) dg = -(gr / v - v / (RE + h)) * Math.cos(g);
+      return { d: [v * Math.sin(g), dv, dg, (RE / (RE + h)) * v * Math.cos(g)], F, D, m, gr, M, at };
+    }
+    let t = 0,
+      s = [0, 0.0001, PI / 2, 0],
+      kicked = false,
+      tKickAct = null;
+    let dVbp = 0,
+      dVg = 0,
+      dVd = 0,
+      qmax = 0,
+      tq = 0,
+      Mq = 0,
+      hq = 0;
+    const tr = [];
+    const nSteps = Math.round(tb / dt);
+    for (let k = 0; k <= nSteps; k++) {
+      t = k * dt;
+      if (!kicked && s[1] >= vKick) {
+        kicked = true;
+        tKickAct = t;
+        s[2] = PI / 2 - kick;
+      }
+      const r1 = rates(t, s, kicked);
+      if (k % Math.round(1 / dt) === 0 || k === nSteps) {
+        const q = noAtm ? 0 : 0.5 * r1.at.rho * s[1] * s[1];
+        if (q > qmax) {
+          qmax = q;
+          tq = t;
+          Mq = r1.M;
+          hq = s[0];
+        }
+        tr.push({ t, h: s[0], v: s[1], gamma: (s[2] * 180) / PI, M: r1.M, q, F: r1.F, acc_g: (r1.F - r1.D) / r1.m / G0, x: s[3], m: r1.m });
+      }
+      if (k === nSteps) break;
+      // losses by trapezoid over the step
+      const step = (sv, dtt, tt) => rates(tt, sv, kicked).d;
+      const k1 = r1.d,
+        k2 = step(s.map((x, i) => x + (0.5 * dt * k1[i])), dt, t + dt / 2),
+        k3 = step(s.map((x, i) => x + (0.5 * dt * k2[i])), dt, t + dt / 2),
+        k4 = step(s.map((x, i) => x + dt * k3[i]), dt, t + dt);
+      const sn = s.map((x, i) => x + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+      const r2 = rates(t + dt, sn, kicked);
+      dVbp += (0.5 * dt * ((Fvac - r1.F) / r1.m + (Fvac - r2.F) / r2.m));
+      dVg += 0.5 * dt * (r1.gr * Math.sin(s[2]) + r2.gr * Math.sin(sn[2]));
+      dVd += 0.5 * dt * (r1.D / r1.m + r2.D / r2.m);
+      s = sn;
+    }
+    const tfin = tr[tr.length - 1];
+    const dVvac = (Fvac / md) * Math.log(m0 / mb); // Tsiolkovsky with the vacuum exhaust velocity
+    const resid = dVvac - dVbp - dVg - dVd - s[1];
+    // Keplerian state at burnout
+    const r = RE + s[0],
+      v = s[1],
+      gam = s[2];
+    const eps = (v * v) / 2 - MU / r,
+      aSM = -MU / (2 * eps),
+      hAng = r * v * Math.cos(gam),
+      ecc = Math.sqrt(Math.max(0, 1 + (2 * eps * hAng * hAng) / (MU * MU)));
+    const vCirc = Math.sqrt(MU / r);
+    const orbit =
+      eps < 0
+        ? { a_km: aSM / 1e3, ecc, perigee_km: (aSM * (1 - ecc) - RE) / 1e3, apogee_km: (aSM * (1 + ecc) - RE) / 1e3, bound: true }
+        : { bound: false };
+    return {
+      t_burn: tb,
+      t_kick_s: tKickAct,
+      m0,
+      m_burnout: mb,
+      propellant_kg: md * tb,
+      structure_plus_payload_kg: mb,
+      structure_implied_kg: mb - veh.payload,
+      mass_ratio: m0 / mb,
+      TW_liftoff: thrust0 / (m0 * G0),
+      F_liftoff_N: thrust0,
+      F_vac_N: Fvac,
+      isp_vac_s: Fvac / (md * G0),
+      burnout: {
+        alt_km: s[0] / 1e3,
+        v_ms: v,
+        mach: tfin.M,
+        gamma_deg: (gam * 180) / PI,
+        downrange_km: s[3] / 1e3,
+        accel_g: tfin.acc_g,
+      },
+      max_q: { q_kPa: qmax / 1e3, t_s: tq, mach: Mq, alt_km: hq / 1e3 },
+      budget: {
+        dV_vacuum: dVvac,
+        back_pressure_loss: dVbp,
+        gravity_loss: dVg,
+        drag_loss: dVd,
+        net_inertial_speed: v,
+        closure_residual: resid,
+        closure_residual_pct: (100 * resid) / dVvac,
+      },
+      leo: {
+        v_circ_at_burnout_ms: vCirc,
+        deficit_ms: vCirc - v,
+        note: 'Non-rotating Earth: a due-east launch from low latitude would gain up to about 0.46 km/s that is not credited here.',
+      },
+      orbit,
+      trajectory: tr,
+      warnings,
+      assumptions: {
+        drag: 'ASSUMED Mach-dependent Cd table for a slender vehicle, scaled by cd_scale = ' + cdS,
+        pitch_program: 'ASSUMED vertical rise to ' + vKick + ' m/s, then a ' + ((kick * 180) / PI).toFixed(2) + ' deg kick and zero-angle-of-attack gravity turn',
+        atmosphere: 'U.S. Standard Atmosphere 1976 (exponential tail above 86 km)',
+        earth: 'Spherical, non-rotating, R = 6371 km',
+      },
+    };
+  }
+
+  function fromDesign(e, o) {
+    const p = e.perf,
+      pa = e.inp.pa_bar * 1e5;
+    return { F_vac: p.thrust + pa * p.Ae, Ae: p.Ae, mdot: p.mdot };
+  }
+  /* find the kick angle that gives a requested flight-path angle at burnout (bisection, coarse dt) */
+  function solveKick(eng, veh, target) {
+    let lo = 0.02,
+      hi = 12;
+    const f = (k) => simulate(eng, Object.assign({}, veh, { kick_deg: k }), { dt: 0.2 }).burnout.gamma_deg - target;
+    if (f(lo) < 0) return { kick: lo, reached: false };
+    if (f(hi) > 0) return { kick: hi, reached: false };
+    for (let i = 0; i < 24; i++) {
+      const mid = 0.5 * (lo + hi);
+      f(mid) > 0 ? (lo = mid) : (hi = mid);
+    }
+    return { kick: 0.5 * (lo + hi), reached: true };
+  }
+  function run(SE, input, veh, o) {
+    const e = SE.design(input);
+    const eng = fromDesign(e);
+    let solved = null;
+    if (veh.target_gamma_deg != null && veh.target_gamma_deg !== '') {
+      solved = solveKick(eng, veh, +veh.target_gamma_deg);
+      veh = Object.assign({}, veh, { kick_deg: solved.kick });
+    }
+    const r = simulate(eng, veh, o);
+    if (solved) r.assumptions.pitch_program += ' (kick solved to reach the requested burnout flight-path angle' + (solved.reached ? '' : ', NOT reached within 0.02-12 deg') + ')';
+    r.engine = { F_vac_each_N: eng.F_vac, Ae_each_m2: eng.Ae, mdot_each_kg_s: eng.mdot, n: veh.n || 1 };
+    return r;
+  }
+
+  const API = { simulate, run, fromDesign, atmosphere, cdOf };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  else root.SE_FLIGHT = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script type="text/plain" id="engine-opt">// Design-space search over chamber pressure, expansion ratio and O/F. Every point is a full
+// SE.design() run. A coarse grid feeds the Pareto front, then a compass search refines each
+// single objective with a penalty for violated limits. Local and derivative-free.
+//   isp  : delivered Isp at the case ambient (maximise)
+//   mass : chamber shell mass proxy (minimise)
+//   twg  : peak gas-side wall temperature (minimise)
+// Mass proxy = revolved contour area x (liner + half channel depth + jacket) x density.
+// It leaves out injector, pumps, valves and plumbing.
+(function (root) {
+  'use strict';
+  let SEref = null;
+  function bind(SE) {
+    SEref = SE;
+  }
+  function SE_() {
+    SEref =
+      SEref || (typeof require !== 'undefined' ? require('./singularity_engine.js') : root.SE);
+    return SEref;
+  }
+  const RHO = { copper: 8900, inconel: 8190, steel: 8000 };
+
+  function shellMass(e, material) {
+    const x = e.c.x,
+      r = e.c.r;
+    let A = 0;
+    for (let i = 1; i < x.length; i++) {
+      const dx = (x[i] - x[i - 1]) / 1000,
+        dr = (r[i] - r[i - 1]) / 1000,
+        rm = (r[i] + r[i - 1]) / 2000;
+      A += 2 * Math.PI * rm * Math.hypot(dx, dr);
+    }
+    const g = e.geo,
+      t = (g.tw + 0.5 * g.hc + g.to) / 1000;
+    return { mass: A * t * (RHO[material] || RHO.copper), area_m2: A, thickness_mm: t * 1000 };
+  }
+
+  function dominated(a, b) {
+    // b dominates a when b is no worse in both objectives and better in one
+    return b.isp >= a.isp && b.mass <= a.mass && (b.isp > a.isp || b.mass < a.mass);
+  }
+  function pareto(pts) {
+    return pts.filter((a) => !pts.some((b) => b !== a && dominated(a, b)));
+  }
+
+  function run(input, opts, progress) {
+    const SE = SE_();
+    opts = opts || {};
+    const e0 = SE.design(input),
+      p0 = e0.perf,
+      material = input.material || 'copper';
+    const lim = {
+      Twg_max_K: opts.Twg_limit_K != null ? +opts.Twg_limit_K : 800,
+      dP_cool_bar: opts.dP_limit_bar != null ? +opts.dP_limit_bar : 0.4 * input.pc,
+    };
+    const box = {
+      pc: [opts.pc_lo || 0.5 * input.pc, opts.pc_hi || 2 * input.pc],
+      eps: [opts.eps_lo || Math.max(3, 0.5 * p0.eps), opts.eps_hi || 2.5 * p0.eps],
+      of: [opts.of_lo || 0.9 * input.of, opts.of_hi || 1.1 * input.of],
+    };
+    let nEval = 0;
+    const cache = new Map();
+    function evalAt(pc, eps, of) {
+      const key = pc.toFixed(3) + '|' + eps.toFixed(3) + '|' + of.toFixed(4);
+      if (cache.has(key)) return cache.get(key);
+      nEval++;
+      let r;
+      try {
+        const e = SE.design(Object.assign({}, input, { pc, eps, of }));
+        const m = shellMass(e, material),
+          p = e.perf;
+        const viol =
+          Math.max(0, p.Twg_max - lim.Twg_max_K) / lim.Twg_max_K +
+          Math.max(0, p.dP_cool / 1e5 - lim.dP_cool_bar) / lim.dP_cool_bar;
+        r = {
+          pc,
+          eps,
+          of,
+          isp: p.isp_delivered,
+          mass: m.mass,
+          Twg: p.Twg_max,
+          dP_cool_bar: p.dP_cool / 1e5,
+          Dt_mm: p.Dt * 1e3,
+          L_total_m: p.L_total,
+          q_peak_MW_m2: p.q_peak / 1e6,
+          viol,
+          feasible: viol === 0,
+        };
+      } catch (err) {
+        r = { pc, eps, of, failed: true, viol: 9, feasible: false, error: String(err.message || err) };
+      }
+      cache.set(key, r);
+      return r;
+    }
+    const lin = (n, [a, b]) =>
+      n < 2 ? [(a + b) / 2] : Array.from({ length: n }, (_, i) => a + ((b - a) * i) / (n - 1));
+    const gp = lin(opts.n_pc || 5, box.pc),
+      ge = lin(opts.n_eps || 4, box.eps),
+      go = lin(opts.n_of || 3, box.of);
+    const total = gp.length * ge.length * go.length;
+    const grid = [];
+    let done = 0;
+    gp.forEach((pc) =>
+      ge.forEach((eps) =>
+        go.forEach((of) => {
+          grid.push(evalAt(pc, eps, of));
+          if (progress && ++done % 5 === 0) progress(0.7 * (done / total));
+        }),
+      ),
+    );
+    const ok = grid.filter((g) => g.feasible);
+    const objective = {
+      isp: (r) => -r.isp + 1e3 * r.viol,
+      mass: (r) => r.mass + 1e4 * r.viol,
+      twg: (r) => r.Twg + 1e4 * r.viol,
+    };
+    function compass(kind, start) {
+      const f = objective[kind];
+      let best = start,
+        fb = f(best),
+        step = 0.15;
+      const lo = [box.pc[0], box.eps[0], box.of[0]],
+        hi = [box.pc[1], box.eps[1], box.of[1]];
+      const x = (r) => [r.pc, r.eps, r.of];
+      let guard = 0;
+      while (step > 0.01 && guard++ < 60) {
+        let improved = false;
+        const cur = x(best);
+        for (let d = 0; d < 3 && !improved; d++)
+          for (const sgn of [1, -1]) {
+            const t = cur.slice();
+            t[d] = Math.min(hi[d], Math.max(lo[d], t[d] + sgn * step * (hi[d] - lo[d])));
+            if (t[d] === cur[d]) continue;
+            const c = evalAt(t[0], t[1], t[2]);
+            if (c.failed) continue;
+            const fc = f(c);
+            if (fc < fb - 1e-9) {
+              best = c;
+              fb = fc;
+              improved = true;
+              break;
+            }
+          }
+        if (!improved) step *= 0.5;
+      }
+      return best;
+    }
+    const pool = ok.length ? ok : grid.filter((g) => !g.failed);
+    const pickMin = (key, sgn) => pool.slice().sort((a, b) => sgn * (a[key] - b[key]))[0];
+    const seeds = { isp: pickMin('isp', -1), mass: pickMin('mass', 1), twg: pickMin('Twg', 1) };
+    const best = {};
+    let k = 0;
+    ['isp', 'mass', 'twg'].forEach((kind) => {
+      if (seeds[kind]) best[kind] = opts.refine === false ? seeds[kind] : compass(kind, seeds[kind]);
+      progress && progress(0.7 + 0.1 * ++k);
+    });
+    const all = Array.from(cache.values()).filter((r) => !r.failed);
+    const front = pareto(all.filter((r) => r.feasible)).sort((a, b) => a.mass - b.mass);
+    return {
+      baseline: evalAt(input.pc, p0.eps, input.of),
+      limits: lim,
+      box,
+      n_evaluations: nEval,
+      n_feasible: all.filter((r) => r.feasible).length,
+      n_total: all.length,
+      pareto: front,
+      best,
+      all: all.map((r) => ({ pc: r.pc, eps: r.eps, of: r.of, isp: r.isp, mass: r.mass, feasible: r.feasible })),
+      method:
+        'Coarse grid on the real model, then compass (pattern) search per objective with an exact penalty for constraint violation. Local, derivative-free; the Pareto front is taken over every feasible point evaluated.',
+      mass_basis:
+        'Shell mass proxy: revolved contour area x (liner + half channel depth + jacket thickness) x wall density. Excludes injector, turbopumps, valves and plumbing.',
+    };
+  }
+
+  const API = { bind, run, shellMass, pareto };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  else root.SE_OPT = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script type="text/plain" id="engine-export">// Contour export (CSV, SolidWorks curve text, CadQuery script, binary STL) and the output
+// traceability table. Units are mm, x along the axis, throat at x = 0, injector face at x < 0.
+// The outer surface is the gas-side contour offset by a uniform shell thickness
+// (liner + channel depth + jacket). Good as a CAD starting point, not a manufacturing model.
+(function (root) {
+  'use strict';
+  const PI = Math.PI;
+
+  function contour(e, n) {
+    const x = e.c.x,
+      r = e.c.r,
+      N = x.length;
+    n = Math.min(N, Math.max(20, n || 160));
+    // keep the first, last and the throat; pick the rest by cumulative arc length
+    const s = [0];
+    for (let i = 1; i < N; i++) s.push(s[i - 1] + Math.hypot(x[i] - x[i - 1], r[i] - r[i - 1]));
+    const out = [],
+      L = s[N - 1];
+    let j = 0;
+    for (let k = 0; k < n; k++) {
+      const target = (L * k) / (n - 1);
+      while (j < N - 1 && s[j + 1] < target) j++;
+      const a = j < N - 1 ? (target - s[j]) / Math.max(1e-12, s[j + 1] - s[j]) : 0;
+      const jj = Math.min(j + 1, N - 1);
+      out.push([x[j] + a * (x[jj] - x[j]), r[j] + a * (r[jj] - r[j])]);
+    }
+    // make sure the throat (minimum radius) is an exact sample
+    let it = 0;
+    for (let i = 1; i < N; i++) if (r[i] < r[it]) it = i;
+    let near = 0;
+    out.forEach((p, i) => {
+      if (Math.abs(p[0] - x[it]) < Math.abs(out[near][0] - x[it])) near = i;
+    });
+    out[near] = [x[it], r[it]];
+    return out;
+  }
+  const shellT = (e) => e.geo.tw + e.geo.hc + e.geo.to;
+
+  function csv(e, n) {
+    const c = contour(e, n);
+    return 'x_mm,r_mm\n' + c.map((p) => p[0].toFixed(4) + ',' + p[1].toFixed(4)).join('\n') + '\n';
+  }
+  function solidworks(e, n) {
+    return contour(e, n).map((p) => p[0].toFixed(4) + '\t' + p[1].toFixed(4) + '\t0').join('\n') + '\n';
+  }
+  function cadquery(e, n, name) {
+    const c = contour(e, n),
+      t = shellT(e);
+    const pts = c.map((p) => '(' + p[0].toFixed(3) + ', ' + p[1].toFixed(3) + ')').join(',\n    ');
+    return `# Generated by Singularity-Max ${name || ''}
+# Gas-side contour (x along the axis, r radial, mm). Throat at x = 0.
+import cadquery as cq
+
+inner = [
+    ${pts}
+]
+t = ${t.toFixed(3)}  # uniform shell thickness, mm (liner + channel depth + jacket)
+
+# closed half-section: gas-side contour out, offset contour back, closed at both ends
+outer = [(x, r + t) for (x, r) in reversed(inner)]
+profile = cq.Workplane("XY").polyline(inner + outer).close()
+body = profile.revolve(360, (0, 0, 0), (1, 0, 0))   # revolve about the x axis
+cq.exporters.export(body, "chamber.step")
+`;
+  }
+
+  /* binary STL of the revolved hollow shell, closed with two annular end faces */
+  function stl(e, o) {
+    o = o || {};
+    const c = contour(e, o.n || 120),
+      seg = o.seg || 72,
+      t = o.thickness != null ? o.thickness : shellT(e);
+    const ring = (rad, x) => {
+      const pts = [];
+      for (let k = 0; k < seg; k++) {
+        const a = (2 * PI * k) / seg;
+        pts.push([x, rad * Math.cos(a), rad * Math.sin(a)]);
+      }
+      return pts;
+    };
+    const inner = c.map((p) => ring(p[1], p[0])),
+      outer = c.map((p) => ring(p[1] + t, p[0]));
+    const tris = [];
+    const quad = (A, B, C, D, flip) => {
+      // A,B along the contour, D,C next ring
+      if (flip) {
+        tris.push([A, C, B], [A, D, C]);
+      } else {
+        tris.push([A, B, C], [A, C, D]);
+      }
+    };
+    for (let i = 0; i < c.length - 1; i++)
+      for (let k = 0; k < seg; k++) {
+        const k2 = (k + 1) % seg;
+        // gas side faces point toward the axis (flip), outer side faces point out
+        quad(inner[i][k], inner[i][k2], inner[i + 1][k2], inner[i + 1][k], true);
+        quad(outer[i][k], outer[i][k2], outer[i + 1][k2], outer[i + 1][k], false);
+      }
+    // end faces: injector end (i = 0) faces -x, exit end faces +x
+    [
+      [0, false],
+      [c.length - 1, true],
+    ].forEach(([i, plus]) => {
+      for (let k = 0; k < seg; k++) {
+        const k2 = (k + 1) % seg;
+        const A = inner[i][k],
+          B = inner[i][k2],
+          C = outer[i][k2],
+          D = outer[i][k];
+        plus ? tris.push([A, C, B], [A, D, C]) : tris.push([A, B, C], [A, C, D]);
+      }
+    });
+    const buf = new ArrayBuffer(84 + 50 * tris.length),
+      dv = new DataView(buf);
+    const hdr = 'Singularity-Max thrust chamber shell, mm';
+    for (let i = 0; i < hdr.length; i++) dv.setUint8(i, hdr.charCodeAt(i));
+    dv.setUint32(80, tris.length, true);
+    let off = 84;
+    tris.forEach((T) => {
+      const u = [T[1][0] - T[0][0], T[1][1] - T[0][1], T[1][2] - T[0][2]],
+        v = [T[2][0] - T[0][0], T[2][1] - T[0][1], T[2][2] - T[0][2]];
+      let nx = u[1] * v[2] - u[2] * v[1],
+        ny = u[2] * v[0] - u[0] * v[2],
+        nz = u[0] * v[1] - u[1] * v[0];
+      const l = Math.hypot(nx, ny, nz) || 1;
+      [nx / l, ny / l, nz / l].forEach((q, i) => dv.setFloat32(off + 4 * i, q, true));
+      T.forEach((P, vi) =>
+        P.forEach((q, i) => dv.setFloat32(off + 12 + 12 * vi + 4 * i, q, true)),
+      );
+      dv.setUint16(off + 48, 0, true);
+      off += 50;
+    });
+    return { bytes: new Uint8Array(buf), triangles: tris.length, thickness_mm: t };
+  }
+  function b64(u8) {
+    let s = '';
+    for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return typeof btoa !== 'undefined' ? btoa(s) : Buffer.from(s, 'binary').toString('base64');
+  }
+  /* closed-surface check for tests: every undirected edge must appear exactly twice */
+  function edgeCheck(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength),
+      n = dv.getUint32(80, true),
+      m = new Map();
+    const key = (o) => [0, 1, 2].map((i) => dv.getFloat32(o + 4 * i, true).toFixed(3)).join(',');
+    for (let t = 0; t < n; t++) {
+      const o = 84 + 50 * t + 12,
+        V = [key(o), key(o + 12), key(o + 24)];
+      [
+        [0, 1],
+        [1, 2],
+        [2, 0],
+      ].forEach(([a, b]) => {
+        const k = V[a] < V[b] ? V[a] + '|' + V[b] : V[b] + '|' + V[a];
+        m.set(k, (m.get(k) || 0) + 1);
+      });
+    }
+    let bad = 0;
+    m.forEach((c) => {
+      if (c !== 2) bad++;
+    });
+    return { triangles: n, edges: m.size, bad_edges: bad };
+  }
+  /* enclosed volume from the signed tetrahedra of the mesh, used to cross-check against Pappus */
+  function meshVolume(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength),
+      n = dv.getUint32(80, true);
+    let V = 0;
+    for (let t = 0; t < n; t++) {
+      const o = 84 + 50 * t + 12,
+        g = (i) => dv.getFloat32(o + 4 * i, true),
+        a = [g(0), g(1), g(2)],
+        b = [g(3), g(4), g(5)],
+        c = [g(6), g(7), g(8)];
+      V += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6;
+    }
+    return V;
+  }
+
+  function files(e, o) {
+    o = o || {};
+    const nm = (e.name || 'design').replace(/[^A-Za-z0-9_-]+/g, '_');
+    const s = stl(e, o);
+    return {
+      name: nm,
+      contour: contour(e, o.n),
+      csv: csv(e, o.n),
+      solidworks: solidworks(e, o.n),
+      cadquery: cadquery(e, o.n, nm),
+      stl_base64: b64(s.bytes),
+      stl_triangles: s.triangles,
+      shell_thickness_mm: s.thickness_mm,
+      throat_dia_mm: e.perf.Dt * 1e3,
+      exit_dia_mm: e.perf.De * 1e3,
+      length_mm: (e.c.x[e.c.x.length - 1] - e.c.x[0]),
+    };
+  }
+
+  /* ---- traceability: each headline output with its governing relation and source ---- */
+  const TRACE = [
+    { key: 'isp_ideal_eq', unit: 's', label: 'Ideal equilibrium Isp', kind: 'TABLE', eq: 'Isp = Cf c* / g0 from equilibrium expansion to the exit pressure', ref: 'NASA CEA (RP-1311) tables, interpolated in O/F, Pc, eps', deps: ['of', 'pc', 'eps', 'propellant'] },
+    { key: 'cstar_eff', unit: 'm/s', label: 'Effective c*', kind: 'ASSUMED', eq: 'c*_eff = eta_c* c*_ideal', ref: 'eta_c* is an input (default 0.98)', deps: ['cstar_ideal', 'eta_cstar'] },
+    { key: 'kin_loss_pct', unit: '%', label: 'Kinetic loss', kind: 'TABLE', eq: 'finite-rate nozzle march minus equilibrium, tabulated vs (O/F, Pc, r_t, eps)', ref: 'Cantera 3.2 with GRI-Mech 3.0', deps: ['of', 'pc', 'Dt', 'eps'] },
+    { key: 'lam_div', unit: '', label: 'Divergence factor', kind: 'LIVE', eq: 'momentum ratio from the axisymmetric method-of-characteristics exit plane (or the conical/bell correlation)', ref: 'Rao (1958); Zucrow & Hoffman', deps: ['eps', 'theta_n', 'theta_e', 'gamma'] },
+    { key: 'eta_bl', unit: '', label: 'Boundary-layer loss', kind: 'LIVE', eq: 'wall-shear thrust loss integrated along the nozzle, evaluated with the flow field and the marched wall temperature (iterated with the throat size)', ref: 'Skin-friction boundary-layer estimate in singularity_engine.js', deps: ['Dt', 'Twg', 'eps'] },
+    { key: 'isp_delivered', unit: 's', label: 'Delivered Isp', kind: 'LIVE', eq: 'Isp_ideal x kinetic x divergence x boundary-layer x c* efficiency (loss chain)', ref: 'Loss chain in the design result', deps: ['isp_ideal_eq', 'kin_loss_pct', 'lam_div', 'eta_bl', 'cstar_eff'] },
+    { key: 'mdot', unit: 'kg/s', label: 'Mass flow', kind: 'LIVE', eq: 'mdot = F / (Isp g0)', ref: 'Definition of specific impulse', deps: ['thrust', 'isp_delivered'] },
+    { key: 'At', unit: 'm2', label: 'Throat area', kind: 'LIVE', eq: 'At = mdot c*_eff / Pc', ref: 'Choked-flow definition of c*', deps: ['mdot', 'cstar_eff', 'pc'] },
+    { key: 'Lstar', unit: 'm', label: 'Chamber L* (volume = L* At)', kind: 'ASSUMED', eq: 'Vc = L* At (L* from the propellant default)', ref: 'Huzel & Huang; Sutton & Biblarz', deps: ['At'] },
+    { key: 'q_peak', unit: 'W/m2', label: 'Peak gas-side heat flux', kind: 'LIVE', eq: 'q = h_g (T_aw - T_wg), h_g from the Bartz correlation with tabulated CEA transport', ref: 'Bartz (1957)', deps: ['pc', 'Dt', 'cstar_eff', 'Tc', 'Twg'] },
+    { key: 'Twg_max', unit: 'K', label: 'Peak hot-wall temperature', kind: 'LIVE', eq: 'Marched 1-D wall balance: gas film, liner conduction, coolant film, with film-cooling credit when set', ref: 'Gnielinski / Haaland coolant side; Simon (1986) film cooling', deps: ['q_peak', 'geo', 'coolant tables', 'material'] },
+    { key: 'dP_cool', unit: 'Pa', label: 'Coolant pressure drop', kind: 'LIVE', eq: 'dp = f (L/D) rho v^2 / 2 along the marched channel with the Haaland friction factor', ref: 'Haaland (1983)', deps: ['mdot_fuel', 'geo', 'coolant tables'] },
+    { key: 'sigma_th_max', unit: 'Pa', label: 'Thermal stress', kind: 'LIVE', eq: 'elastic stress from the wall temperature difference, E alpha dT / (2(1 - nu))', ref: 'Thick-wall thermoelastic estimate; FEA tab refines it', deps: ['Twg_max', 'material'] },
+    { key: 'inj', label: 'Injector flow areas', kind: 'LIVE', eq: 'A = mdot / (Cd sqrt(2 rho dp)) per propellant at dp = 20 % Pc', ref: 'Incompressible orifice flow', deps: ['mdot_ox', 'mdot_fuel', 'pc'] },
+    { key: 'Pe', unit: 'bar', label: 'Exit pressure (separation check)', kind: 'LIVE', eq: 'flag when Pe < 0.4 Pa', ref: 'Summerfield criterion', deps: ['Pe', 'ambient'] },
+    { key: 'cycle', label: 'Feed-cycle balance', kind: 'LIVE', eq: 'pump = mdot dp / (rho eta); turbine = mdot eta cp T [1 - PR^(-(g-1)/g)]', ref: 'Huzel & Huang; preburner states from CEA tables', deps: ['pc', 'mdot', 'cycle options'] },
+  ];
+
+  const API = { contour, csv, solidworks, cadquery, stl, files, edgeCheck, meshVolume, TRACE, b64 };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  else root.SE_EXPORT = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script type="text/plain" id="engine-dispatch">/* dispatcher shared by the Web Worker and the in-thread fallback: the ONLY entry points the interface can reach */
 var __S = null;
 function __init(th, cl, kt, pb, vp) {
@@ -5831,9 +6990,15 @@ function __init(th, cl, kt, pb, vp) {
     FEA = require('se_fea'),
     UQ = require('se_uq'),
     API = require('se_api'),
-    VV = require('se_vv');
+    VV = require('se_vv'),
+    COMB = require('se_comb'),
+    FLT = require('se_flight'),
+    OPT = require('se_opt'),
+    EXP = require('se_export');
   UQ.bind(SE);
-  const mods = { SE, MOC, FEA, CYC: CY, UQ, API };
+  COMB.bind(SE);
+  OPT.bind(SE);
+  const mods = { SE, MOC, FEA, CYC: CY, UQ, API, COMB, FLT, OPT, EXP };
   API.bind(mods, {
     thermo: (th.meta && th.meta.source) || 'NASA CEA tables',
     coolant: (cl.meta && cl.meta.source) || 'CoolProp tables',
@@ -5841,7 +7006,7 @@ function __init(th, cl, kt, pb, vp) {
     preburner: (pb.meta && pb.meta.source) || 'NASA CEA preburner tables',
   });
   VV.bind(mods);
-  __S = { SE, CY, MOC, FEA, UQ, API, VV, vp };
+  __S = { SE, CY, MOC, FEA, UQ, API, VV, COMB, FLT, OPT, EXP, vp };
   return { version: SE.VERSION };
 }
 function __clean(v) {
@@ -5903,6 +7068,18 @@ function __handle0(method, a, progress) {
     }
     case 'uq':
       return S.UQ.run(a.input, a.opts || {}, progress);
+    case 'comb':
+      return S.COMB.analyze(a.input, a.opts || {});
+    case 'throttle':
+      return S.COMB.throttle(a.input, a.opts || {});
+    case 'flight':
+      return S.FLT.run(S.SE, a.input, a.veh, a.opts || {});
+    case 'opt':
+      return S.OPT.run(a.input, a.opts || {}, progress);
+    case 'export':
+      return S.EXP.files(S.SE.design(a.input), a.opts || {});
+    case 'trace':
+      return S.EXP.TRACE;
     case 'project_save': {
       const p = S.API.newProject(a.name);
       a.cases.forEach((c) => S.API.addCase(p, c.name, c.raw, c.env));
@@ -5934,6 +7111,10 @@ window.EngineClient = (function () {
     ['se_uq', 'engine-uq'],
     ['se_api', 'engine-api'],
     ['se_vv', 'engine-vv'],
+    ['se_comb', 'engine-comb'],
+    ['se_flight', 'engine-flight'],
+    ['se_opt', 'engine-opt'],
+    ['se_export', 'engine-export'],
   ];
   const dispatch = $('engine-dispatch').textContent;
   let bundle =
@@ -6276,7 +7457,7 @@ async function computeLive(){const inp=readInputs(),b=L$('go');
  const pr=LP.info.propellants[inp.propellant];if(!(inp.of>=pr.ofTable[0]&&inp.of<=pr.ofTable[1]))bad.push(`O/F for ${pr.label} must be ${pr.ofTable[0]}–${pr.ofTable[1]}`);
  if(inp.eps_mode==='manual'&&!(inp.eps>=LP.info.epsRange[0]))bad.push('ε must be ≥ '+LP.info.epsRange[0]);
  if(bad.length){status(bad.join(' · '),'err');return}
- b.disabled=true;status('computing…');
+ b.disabled=true;status('computing');
  try{const r=await EngineClient.call('design',inp),e=r.result;e.timing={ms:r.ms,mode:r.mode};DATA.push(e);S.d=DATA.length-1;S.hover=null;fillDesigns();all();status(`${e.name.replace(' [live]','')}: eps ${e.perf.eps.toFixed(1)}, Isp ${e.perf.isp_delivered.toFixed(1)} s (${r.ms.toFixed(0)} ms)`,'ok')}
  catch(err){status('engine error: '+err.message,'err')}finally{b.disabled=false}}
 function useTemplate(){const d=D(),i=d.inp,key=/RP/.test(i.fuel)?'LOX/RP-1':/CH4/.test(i.fuel)?'LOX/LCH4':/H2/.test(i.fuel)?'LOX/LH2':/C3H8/.test(i.fuel)?'LOX/Propane':'LOX/Ethanol';
@@ -6783,7 +7964,7 @@ const chip=(c,t)=>`<span class="chip ${c}">${t}</span>`;
 const pc3=(x,a,b)=>Math.abs(x)<=a?'ok':Math.abs(x)<=b?'wn':'bd';
 host.innerHTML=`<div class="sec verdict"><h3>Live engine checks</h3>
 <p style="color:var(--fg);font-size:14px;margin:6px 0">The engine (<code>singularity_engine.js</code>) sizes and analyses any thrust at sea level, any altitude or vacuum, for five propellants. Sections G-J below re-run when the page loads, so none of the numbers in them are pasted in. <span id="eng_mode" class="mut"></span></p></div>
-<div class="sec"><h3>G · What is live, what is table data, what is stored, what is assumed</h3><div class="scroll"><table><tr><th>Quantity</th><th>Status</th><th>How it is obtained</th></tr>
+<div class="sec"><h3>G. What is live, what is table data, what is stored, what is assumed</h3><div class="scroll"><table><tr><th>Quantity</th><th>Status</th><th>How it is obtained</th></tr>
 <tr><td class="l">Chamber T, c*, γ, exit velocity / T / P / Mach, frozen Isp</td><td>${chip('T','TABLE')}${chip('L','LIVE')}</td><td class="l" style="text-align:left">NASA CEA 3.3.4 equilibrium rocket problem, computed offline on a grid (O/F × P<sub>c</sub> × ε); interpolated live. Error vs fresh CEA: section H.</td></tr>
 <tr><td class="l">Chamber viscosity, conductivity, c<sub>p</sub>, Pr</td><td>${chip('T','TABLE')}${chip('L','LIVE')}</td><td class="l" style="text-align:left">CEA transport library at the chamber state, tabulated; replaces the Huzel-Huang approximations (which under-predict μ by 28–44 %, section E).</td></tr>
 <tr><td class="l">Coolant ρ, c<sub>p</sub>, μ, k, T<sub>sat</sub></td><td>${chip('T','TABLE')}${chip('L','LIVE')}</td><td class="l" style="text-align:left">CoolProp 8 (real-fluid EOS) tabulated on a T × P grid for dodecane, methane, hydrogen, ethanol, propane.</td></tr>
@@ -6791,10 +7972,10 @@ host.innerHTML=`<div class="sec verdict"><h3>Live engine checks</h3>
 <tr><td class="l">Divergence factor, bell angles, contraction ratio, boundary-layer loss</td><td>${chip('L','LIVE')}</td><td class="l" style="text-align:left">Empirical correlations calibrated to the stored solver (they reproduce its geometry to &lt; 0.5 %); not MOC/CFD.</td></tr>
 <tr><td class="l">c* efficiency, kinetic-loss fraction</td><td>${chip('A','ASSUMED')}</td><td class="l" style="text-align:left">Inputs. The live engine has <b>no finite-rate kinetics</b>; it applies the assumed fraction of the equilibrium–frozen gap.</td></tr>
 <tr><td class="l">The four preset designs (and their finite-rate kinetics for CH<sub>4</sub>, H<sub>2</sub>)</td><td>${chip('P','STORED')}</td><td class="l" style="text-align:left">Stored output of the original offline <code>lre</code> solver (Cantera kinetics). Selectable in the Studio, labelled as such.</td></tr></table></div></div>
-<div class="sec"><h3>H · Live thermochemistry vs fresh NASA CEA (300 off-grid points)</h3><p>60 random (O/F, P<sub>c</sub>, ε) points per propellant that are <b>not</b> on the tabulation grid (P<sub>c</sub> 5–300 bar, ε 2–400) were solved with the CEA executable. The engine is asked the same questions right now.</p><div id="hres" class="scroll">running…</div></div>
-<div class="sec"><h3>I · Regression: live engine vs the stored solver (same inputs, same channel geometry)</h3><p>The four stored designs are re-created from their inputs by the live engine, forced to use each stored design's channel height, width and count, so that differences come from the physics, not from sizing choices. Frictional pressure drop only (the stored solver has no acceleration term).</p><div id="ireg" class="scroll">running…</div></div>
-<div class="sec"><h3>J · Published engines, run through the live engine (vacuum)</h3><p>Same four published engines as section B, now sized and analysed by the live engine from their published thrust, P<sub>c</sub>, O/F and ε (c* efficiency 0.98 assumed, as in B).</p><div id="jpub" class="scroll">running…</div></div>
-<div class="sec"><h3>K · Interface ↔ engine separation</h3><p>The interface contains no physics. It sends a JSON request and receives a JSON result through <code>EngineClient</code>; the engine executes in a <b>Web Worker</b> (separate thread, no DOM access) and falls back to in-thread execution only where workers are blocked. The same engine file runs headless in Node. All three exports below are generated from the exact code and tables embedded in this page.</p>
+<div class="sec"><h3>H. Live thermochemistry vs fresh NASA CEA (300 off-grid points)</h3><p>60 random (O/F, P<sub>c</sub>, ε) points per propellant that are <b>not</b> on the tabulation grid (P<sub>c</sub> 5–300 bar, ε 2–400) were solved with the CEA executable. The engine is asked the same questions right now.</p><div id="hres" class="scroll">running...</div></div>
+<div class="sec"><h3>I. Regression: live engine vs the stored solver (same inputs, same channel geometry)</h3><p>The four stored designs are re-created from their inputs by the live engine, forced to use each stored design's channel height, width and count, so that differences come from the physics, not from sizing choices. Frictional pressure drop only (the stored solver has no acceleration term).</p><div id="ireg" class="scroll">running...</div></div>
+<div class="sec"><h3>J. Published engines, run through the live engine (vacuum)</h3><p>Same four published engines as section B, now sized and analysed by the live engine from their published thrust, P<sub>c</sub>, O/F and ε (c* efficiency 0.98 assumed, as in B).</p><div id="jpub" class="scroll">running...</div></div>
+<div class="sec"><h3>K. Interface ↔ engine separation</h3><p>The interface contains no physics. It sends a JSON request and receives a JSON result through <code>EngineClient</code>; the engine executes in a <b>Web Worker</b> (separate thread, no DOM access) and falls back to in-thread execution only where workers are blocked. The same engine file runs headless in Node. All three exports below are generated from the exact code and tables embedded in this page.</p>
 <pre id="kapi"></pre><div class="lact" style="display:flex;gap:8px;flex-wrap:wrap"><button id="k_js">Download singularity_engine.js</button><button id="k_th">Download engine_tables.json (CEA)</button><button id="k_cl">Download coolant_tables.json (CoolProp)</button><button id="k_cli">Download CLI wrapper</button></div>
 <p style="margin-top:8px">Headless: <code>node singularity_engine_cli.js request.json --summary</code></p></div>`;
 const FEEL={thrust:1};
@@ -6827,7 +8008,7 @@ async function run(){await EngineClient.ready();$('eng_mode').textContent='Engin
  $('jpub').innerHTML=j+`</table><p>SSME throat heat-flux benchmark (NASA TP-3431: ${pub.toFixed(0)} MW/m²): live engine ${ss.toFixed(0)} MW/m² (${(100*(ss/pub-1)).toFixed(0)} %), inside the ±20–30 % that Bartz-type correlations carry. Published Isp includes engine-specific effects the model does not resolve.</p>`;
  /* K */
  const ex={method:'design',args:{propellant:'LOX/LCH4',thrust:250000,pc:100,of:3.5,ambient:{mode:'sealevel'},eps_mode:'ambient',pe_ratio:1}};
- $('kapi').textContent='request  → '+JSON.stringify(ex)+'\nresponse ← { name, perf{isp_delivered, Dt, De, L_total, q_peak, …}, c{x,r}, flow{…}, th{…}, alt{…}, chain, warn, notes, provenance{engine, version, mode:"live"} }\nother methods: performance, sweepOF, sweepEps, optimumOF, ambientPa, performanceBatch, designBatch, info';
+ $('kapi').textContent='request:  '+JSON.stringify(ex)+'\nresponse: { name, perf{isp_delivered, Dt, De, L_total, q_peak, ...}, c{x,r}, flow{...}, th{...}, alt{...}, chain, warn, notes, provenance{engine, version, mode:"live"} }\nother methods: performance, sweepOF, sweepEps, optimumOF, ambientPa, performanceBatch, designBatch, info';
  const dl=(name,text,type)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type||'text/plain'}));a.download=name;a.click()};
  $('k_js').onclick=()=>dl('singularity_engine.js',EngineClient.source(),'text/javascript');$('k_th').onclick=()=>dl('engine_tables.json',EngineClient.thermoText(),'application/json');$('k_cl').onclick=()=>dl('coolant_tables.json',EngineClient.coolantText(),'application/json');
  $('k_cli').onclick=()=>dl('singularity_engine_cli.js',CLI_SRC,'text/javascript')}
@@ -7092,7 +8273,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   };
   $('c_run').onclick = async () => {
     busy($('c_run'), true);
-    setStat('c_status', 'running design…');
+    setStat('c_status', 'running design');
     try {
       const raw = readCase(),
         r = await EC.call('api', { method: 'design', raw }),
@@ -7108,6 +8289,10 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
       ST.env = env;
       ST.input = env.request.input;
       ST.moc = ST.fea = ST.cyc = ST.uq = null;
+      ST.comb = ST.thr = ST.flt = ST.opt = ST.geo = null;
+      ['m_out', 'f_out', 'y_out', 'u_out', 'k_out', 't_out', 'a_out', 'o_out', 'g_out', 'x_out'].forEach((id) => {
+        if ($(id)) $(id).innerHTML = '';
+      });
       renderCase(env, r);
       setStat(
         'c_status',
@@ -7209,7 +8394,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
     busy($('m_opt'), true);
     setStat(
       'm_status',
-      optimize ? 'optimising bell angles (several MOC solves)…' : 'solving characteristics…',
+      optimize ? 'optimising bell angles (several MOC solves)' : 'solving characteristics',
     );
     try {
       const input = ST.input || (await getInput()),
@@ -7353,7 +8538,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   }
   async function runFea() {
     busy($('f_run'), true);
-    setStat('f_status', 'meshing & solving (plane-strain elasto-plastic cycles)…');
+    setStat('f_status', 'meshing & solving (plane-strain elasto-plastic cycles)');
     try {
       const input = ST.input || (await getInput()),
         r = await EC.call('fea', { input, opts: { cycles: 3 } }),
@@ -7373,7 +8558,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
     if (!d) return;
     const f = $('f_field').value;
     let h = d.critical
-      ? `<div class="cards">${kcard('Critical station', esc(d.critical.name), '')}${kcard('Cycles to crack (Manson–Halford)', num(d.critical.cycles_to_crack, 0), 'cycles')}${kcard('… with safety factor 4 on life', num(d.critical.cycles_with_SF4, 0), 'cycles')}${kcard('Mechanical strain range', num(d.critical.strain_range_mech * 100, 3), '%')}</div>`
+      ? `<div class="cards">${kcard('Critical station', esc(d.critical.name), '')}${kcard('Cycles to crack (Manson-Halford)', num(d.critical.cycles_to_crack, 0), 'cycles')}${kcard('With safety factor 4 on life', num(d.critical.cycles_with_SF4, 0), 'cycles')}${kcard('Mechanical strain range', num(d.critical.strain_range_mech * 100, 3), '%')}</div>`
       : '';
     h +=
       '<div class="cae2">' +
@@ -7411,7 +8596,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   /* ---------- 4. cycle ---------- */
   $('y_run').onclick = async () => {
     busy($('y_run'), true);
-    setStat('y_status', 'solving power balances…');
+    setStat('y_status', 'solving power balances');
     try {
       const input = ST.input || (await getInput()),
         opts = {};
@@ -7479,7 +8664,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
     busy($('u_run'), true);
     $('u_prog').hidden = false;
     $('u_prog').value = 0;
-    setStat('u_status', 'sampling…');
+    setStat('u_status', 'sampling');
     try {
       const input = ST.input || (await getInput()),
         n = Math.max(30, Math.min(600, +$('u_n').value || 100)),
@@ -7545,7 +8730,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
       { xl: L[0] + ' [' + L[1] + ']', marks },
     )}</div><div class="cbox"><h4>Sobol indices: first-order (amber) &amp; total (silver)</h4>${barChart(
       R.sobol.map((o) => ({
-        label: o.label.length > 22 ? o.label.slice(0, 21) + '…' : o.label,
+        label: o.label.length > 22 ? o.label.slice(0, 21) + '' : o.label,
         vals: [
           { v: Math.max(0, o.S1), color: '#f6ad55' },
           { v: Math.max(0, o.ST), color: '#cfd3dc' },
@@ -7570,7 +8755,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   /* ---------- 6. V&V ---------- */
   $('v_run').onclick = async () => {
     busy($('v_run'), true);
-    setStat('v_status', 'running suite (≈10–40 s)…');
+    setStat('v_status', 'running suite, about 10 to 40 s');
     try {
       const r = await EC.call('vv', {}),
         d = r.result;
@@ -7592,7 +8777,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
     if (!d) return;
     const S = d.summary,
       vi = S.validation_isp_vac;
-    let h = `<div class="cards">${kcard('Total tests', S.total, '')}${kcard('Passed', S.pass, '')}${kcard('Failed', S.fail, '')}${kcard('Verification / validation', S.verification + ' / ' + S.validation, '')}${vi ? kcard('Isp(vac) error vs published, mean', (vi.mean_error_pct >= 0 ? '+' : '') + num(vi.mean_error_pct, 2), '% (n=' + vi.n + ')') + kcard('… RMS / max |err|', num(vi.rms_error_pct, 2) + ' / ' + num(vi.max_abs_error_pct, 2), '%') : ''}</div>`;
+    let h = `<div class="cards">${kcard('Total tests', S.total, '')}${kcard('Passed', S.pass, '')}${kcard('Failed', S.fail, '')}${kcard('Verification / validation', S.verification + ' / ' + S.validation, '')}${vi ? kcard('Isp(vac) error vs published, mean', (vi.mean_error_pct >= 0 ? '+' : '') + num(vi.mean_error_pct, 2), '% (n=' + vi.n + ')') + kcard('RMS / max error', num(vi.rms_error_pct, 2) + ' / ' + num(vi.max_abs_error_pct, 2), '%') : ''}</div>`;
     const val = d.tests.filter((t) => t.kind === 'validation' && /Isp/.test(t.title));
     if (val.length) {
       const lo = Math.min(...val.map((t) => t.ref)) * 0.95,
@@ -7641,6 +8826,9 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
     'Huzel, D.K. & Huang, D.H., <i>Design of Liquid Propellant Rocket Engines</i>, NASA SP-125 (1971); Sutton & Biblarz, <i>Rocket Propulsion Elements</i>.',
     'Manson, S.S. & Halford, G.R., <i>Fatigue and Durability of Structural Materials</i> (ASM, 2006): low-cycle fatigue (universal-slopes form).',
     'McKay, Beckman & Conover, Technometrics 21, 239 (1979): Latin hypercube; Saltelli et al., Comput. Phys. Commun. 181, 259 (2010) and Jansen, CPC 117, 35 (1999): Sobol estimators; Ishigami & Homma (1990): analytic test function.',
+    'Lefebvre, A.H., <i>Atomization and Sprays</i> (1989); Lorenzetto, G.E. & Lefebvre, A.H., AIAA J. 15, 1006 (1977): drop-size estimates (form as commonly quoted).',
+    'NASA SP-194, <i>Liquid Rocket Engine Combustion Instability</i> (1972): chugging rule of thumb; Summerfield et al., Jet Propulsion 24, 254 (1954): separation criterion.',
+    'U.S. Standard Atmosphere, 1976 (NOAA/NASA/USAF): atmosphere model used in the ascent module.',
     'Published engine data: L3Harris RS-25 sheet; AIAA Atlas V launch-services guide; Wikipedia pages for RL10, F-1, RS-68, Vulcain; NASA TP-3431 (SSME heat flux): see V&V table for per-row source strings.',
   ];
   $('r_gen').onclick = () => {
@@ -7652,7 +8840,11 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
       ['Case, API envelope and provenance', 'c_out'],
       ['Nozzle: method of characteristics', 'm_out'],
       ['Thermal-structural FEA', 'f_out'],
+      ['Combustor and injector', 'k_out'],
       ['Feed-system cycle', 'y_out'],
+      ['Throttle sweep', 't_out'],
+      ['Ascent', 'a_out'],
+      ['Design-space search', 'o_out'],
       ['Uncertainty and sensitivity', 'u_out'],
       ['Verification & validation', 'v_out'],
     ];
@@ -7683,7 +8875,476 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
       `<p><a href="${blobUrl}" download="singularity_engine_report.html" style="color:var(--hi)">Download report (.html)</a> · <a href="${blobUrl}" target="_blank" style="color:var(--hi)">Open in new tab (print to PDF)</a> · ${(html.length / 1024).toFixed(0)} KB</p><iframe style="width:100%;height:520px;border:1px solid var(--line);background:#fff" src="${blobUrl}"></iframe>`;
     setStat('r_status', 'done', 'ok');
   };
-  window.__CAE = { ST, EC };
+  window.__CAE = { ST, EC, getInput, lineChart, barChart, kcard, warnList, setStat, busy, num, esc };
+})();
+</script>
+<script>/* ===== Analysis workbench, part 2: combustor/injector, throttle, ascent, optimiser, geometry, traceability.
+   No physics here: every number comes from EngineClient. ===== */
+(function () {
+  const H = window.__CAE;
+  if (!H) return;
+  const { ST, EC, getInput, lineChart, barChart, kcard, warnList, setStat, busy, num, esc } = H;
+  const $ = (id) => document.getElementById(id);
+  const val = (id) => {
+    const v = $(id).value.trim();
+    return v === '' ? null : +v;
+  };
+  const pill = (ok, yes, no) => `<span class="pill ${ok ? 'ok' : 'bad'}">${ok ? yes : no}</span>`;
+  const statusPill = (s) =>
+    `<span class="pill ${/^LIVE/.test(s) ? 'ok' : 'warn'}">${esc(String(s).split(' ')[0])}</span>`;
+  const cards = (a) => `<div class="cards">${a.join('')}</div>`;
+  const box = (t, svg) => `<div class="cbox"><h4>${esc(t)}</h4>${svg}</div>`;
+  async function guarded(btnId, stId, msg, fn) {
+    busy($(btnId), true);
+    setStat(stId, msg);
+    try {
+      await fn();
+    } catch (e) {
+      setStat(stId, e.message, 'err');
+    } finally {
+      busy($(btnId), false);
+    }
+  }
+
+  /* ---------- combustor & injector ---------- */
+  $('k_run').onclick = () =>
+    guarded('k_run', 'k_status', 'sizing', async () => {
+      const input = ST.input || (await getInput());
+      const o = { family: $('k_fam').value, fuel_state: $('k_fs').value };
+      if (val('k_N')) o.N = val('k_N');
+      if (val('k_dp')) o.dp_frac = val('k_dp');
+      if (val('k_cd')) o.Cd = val('k_cd');
+      const r = await EC.call('comb', { input, opts: { injector: o } }),
+        d = r.result,
+        c = d.combustor,
+        j = d.injector;
+      ST.comb = d;
+      let h = '<h5 class="h5">Combustor</h5>';
+      h += cards([
+        kcard('Throat diameter', num(c.Dt_m * 1e3, 1), 'mm'),
+        kcard('Chamber diameter', num(c.Dc_m * 1e3, 1), 'mm'),
+        kcard('Contraction ratio', num(c.contraction_ratio, 2), 'Ac/At'),
+        kcard('Barrel length', num(c.barrel_length_m * 1e3, 1), 'mm'),
+        kcard('Chamber length to throat', num(c.chamber_length_m * 1e3, 1), 'mm'),
+        kcard('L* (design / contour)', num(c.Lstar_design_m, 3) + ' / ' + num(c.Lstar_contour_m, 3), 'm'),
+        kcard('Chamber volume', num(c.volume_contour_m3 * 1e3, 2), 'L'),
+        kcard('Stay time', num(c.stay_time_ms, 2), 'ms (ρ V / ṁ)'),
+        kcard('Sound speed in chamber', num(c.chamber_gas.sound_speed, 0), 'm/s'),
+        kcard('1T (first tangential)', num(c.acoustic.f_1T_Hz, 0), 'Hz'),
+        kcard('1R (first radial)', num(c.acoustic.f_1R_Hz, 0), 'Hz'),
+        kcard('1L (first longitudinal)', num(c.acoustic.f_1L_Hz, 0), 'Hz'),
+      ]);
+      h += `<p class="hint">${esc(c.acoustic.note)}</p>`;
+      h += `<h5 class="h5">Injector: ${esc(j.family)}</h5>`;
+      const k = [
+        kcard('Injector dp', num(j.dp_bar, 1), 'bar'),
+        kcard('dp / Pc', num(j.dp_over_pc * 100, 1) + ' %', j.chugging.ok ? 'meets the 15 % chugging rule' : 'below the 15 % chugging rule'),
+        kcard('Oxidiser velocity', num(j.ox.v, 1), 'm/s'),
+        kcard('Fuel velocity (' + j.fuel.state.split(' (')[0] + ')', num(j.fuel.v, 1), 'm/s'),
+        kcard('Elements', j.n_elements, ''),
+      ];
+      if (j.ox_post_id_mm != null) k.push(kcard('LOX post ID', num(j.ox_post_id_mm, 2), 'mm'), kcard('Fuel annulus gap', num(j.fuel_annulus_gap_mm, 2), 'mm'), kcard('Element OD / pitch', num(j.element_od_mm, 1) + ' / ' + num(j.pitch_mm, 1), 'mm'), kcard('Momentum flux ratio J', num(j.momentum_flux_ratio_J, 2), j.J_in_window ? 'inside 2 to 20' : 'outside 2 to 20'));
+      if (j.ox_orifice_d_mm != null) k.push(kcard('Orifice diameter', num(j.ox_orifice_d_mm, 2), 'mm'), kcard('Flow per element', num(j.mdot_per_element_kg_s, 3), 'kg/s'), kcard('Pitch', num(j.pitch_mm, 1), 'mm'));
+      if (j.pintle_D_mm != null) k.push(kcard('Pintle diameter', num(j.pintle_D_mm, 1), 'mm'), kcard('Radial holes', j.ox_radial_holes, 'd = ' + num(j.ox_hole_d_mm, 2) + ' mm'), kcard('Blockage factor', num(j.blockage_factor, 2), ''), kcard('Fuel gap', num(j.fuel_gap_mm, 2), 'mm'), kcard('Total momentum ratio', num(j.total_momentum_ratio, 2), ''));
+      if (j.ox_jet_d_mm != null) k.push(kcard('Oxidiser jet', num(j.ox_jet_d_mm, 2), 'mm'), kcard('Fuel jet', num(j.fuel_jet_d_mm, 2), 'mm'), kcard('Pitch', num(j.pitch_mm, 1), 'mm'), kcard('Jet momentum ratio', num(j.jet_momentum_ratio, 2), 'fuel / oxidiser'));
+      if (j.smd_um != null) k.push(kcard('Droplet SMD', num(j.smd_um, 1), 'µm (estimate)'));
+      h += cards(k);
+      h += `<p class="hint">${esc(j.smd_basis || '')}</p>` + warnList(j.warnings.map((w) => ({ msg: w })));
+      h +=
+        '<h5 class="h5">All four families at the same dp</h5><table class="ct"><tr><th>Family</th><th>Elements</th><th>SMD [µm]</th><th>Chugging rule</th><th>Notes</th></tr>' +
+        Object.entries(d.families)
+          .map(([f, v]) =>
+            v.error
+              ? `<tr><td>${esc(f)}</td><td colspan="4">${esc(v.error)}</td></tr>`
+              : `<tr><td><b>${esc(f)}</b></td><td class="n">${v.n}</td><td class="n">${v.smd_um == null ? '–' : num(v.smd_um, 1)}</td><td>${pill(v.chugging_ok, 'ok', 'below 15 %')}</td><td>${v.detail.warnings.map(esc).join('<br>')}</td></tr>`,
+          )
+          .join('') +
+        '</table>';
+      h +=
+        '<details><summary>Assumptions</summary><table class="ct"><tr><th>Parameter</th><th>Value</th><th>Status</th></tr>' +
+        Object.entries(j.assumptions)
+          .map(([n, v]) => `<tr><td>${esc(n)}</td><td class="n">${esc(typeof v.value === 'number' ? num(v.value, 3) : v.value)}</td><td>${esc(v.status)}</td></tr>`)
+          .join('') +
+        '</table></details>';
+      $('k_out').innerHTML = h;
+      setStat('k_status', 'done in ' + num(r.ms, 0) + ' ms', 'ok');
+    });
+
+  /* ---------- throttle ---------- */
+  $('t_run').onclick = () =>
+    guarded('t_run', 't_status', 'running 7 part-load designs', async () => {
+      const input = ST.input || (await getInput());
+      const r = await EC.call('throttle', { input, opts: {} }),
+        d = r.result,
+        rows = d.rows.filter((x) => !x.error).sort((a, b) => a.throttle - b.throttle);
+      ST.thr = d;
+      let h =
+        '<table class="ct"><tr><th>Throttle</th><th>Pc [bar]</th><th>Thrust [kN]</th><th>ṁ [kg/s]</th><th>Isp [s]</th><th>Pe / Pa</th><th>Separation</th><th>Injector dp / Pc</th><th>Chugging rule</th><th>Hot-wall T [K]</th></tr>' +
+        rows
+          .slice()
+          .reverse()
+          .map(
+            (x) =>
+              `<tr class="${x.separation || !x.chugging_ok ? 'fail' : 'pass'}"><td class="n">${num(x.throttle * 100, 0)} %</td><td class="n">${num(x.pc_bar, 1)}</td><td class="n">${num(x.thrust_N / 1e3, 1)}</td><td class="n">${num(x.mdot_kg_s, 1)}</td><td class="n">${num(x.isp_s, 1)}</td><td class="n">${x.pe_over_pa == null ? '–' : num(x.pe_over_pa, 2)}</td><td>${x.pe_over_pa == null ? 'vacuum' : pill(!x.separation, 'attached', 'separated')}</td><td class="n">${num(x.dp_over_pc * 100, 1)} %</td><td>${pill(x.chugging_ok, 'ok', 'below 15 %')}</td><td class="n">${num(x.Twg_max_K, 0)}</td></tr>`,
+          )
+          .join('') +
+        '</table>';
+      const xs = rows.map((x) => x.throttle * 100);
+      h += '<div class="cae2">';
+      h += box('Isp vs throttle [s]', lineChart([{ name: 'delivered Isp', x: xs, y: rows.map((x) => x.isp_s) }], { xl: 'throttle [%]', yl: 'Isp [s]' }));
+      h += box('Injector dp / Pc [%] (rule of thumb: 15)', lineChart([{ name: 'dp / Pc', x: xs, y: rows.map((x) => x.dp_over_pc * 100) }, { name: 'limit', x: [xs[0], xs[xs.length - 1]], y: [15, 15], dash: '5 4', color: '#f87171' }], { xl: 'throttle [%]', yl: 'dp / Pc [%]', y0: 0 }));
+      if (rows[0].pe_over_pa != null)
+        h += box('Exit pressure / ambient (Summerfield limit 0.4)', lineChart([{ name: 'Pe / Pa', x: xs, y: rows.map((x) => x.pe_over_pa) }, { name: 'limit', x: [xs[0], xs[xs.length - 1]], y: [0.4, 0.4], dash: '5 4', color: '#f87171' }], { xl: 'throttle [%]', yl: 'Pe / Pa', y0: 0 }));
+      h += box('Thrust [kN]', lineChart([{ name: 'thrust', x: xs, y: rows.map((x) => x.thrust_N / 1e3) }], { xl: 'throttle [%]', yl: 'kN', y0: 0 }));
+      h += '</div>';
+      h += `<p class="hint">${esc(d.basis)}</p>`;
+      $('t_out').innerHTML = h;
+      setStat('t_status', 'done in ' + num(r.ms, 0) + ' ms', 'ok');
+    });
+
+  /* ---------- ascent ---------- */
+  $('a_run').onclick = () =>
+    guarded('a_run', 'a_status', 'flying', async () => {
+      const input = ST.input || (await getInput());
+      const veh = {
+        n: val('a_n') || 1,
+        m0: val('a_m0'),
+        payload: val('a_pl') || 0,
+        t_burn: val('a_tb'),
+        d_ref: val('a_d') || 3,
+        kick_speed: val('a_vk') == null ? 60 : val('a_vk'),
+        kick_deg: val('a_k') == null ? 0.8 : val('a_k'),
+        cd_scale: val('a_cd') == null ? 1 : val('a_cd'),
+      };
+      if (val('a_tg') != null) veh.target_gamma_deg = val('a_tg');
+      const r = await EC.call('flight', { input, veh, opts: {} }),
+        d = r.result,
+        b = d.budget,
+        t = d.trajectory;
+      ST.flt = d;
+      const o = d.orbit;
+      let h = cards([
+        kcard('Thrust-to-weight at lift-off', num(d.TW_liftoff, 2), ''),
+        kcard('Propellant burned', num(d.propellant_kg / 1e3, 1), 't'),
+        kcard('Mass ratio', num(d.mass_ratio, 2), ''),
+        kcard('Implied structure mass', num(d.structure_implied_kg / 1e3, 1), 't (burnout minus payload)'),
+        kcard('Burnout altitude', num(d.burnout.alt_km, 1), 'km'),
+        kcard('Burnout speed', num(d.burnout.v_ms, 0), 'm/s (Mach ' + num(d.burnout.mach, 1) + ')'),
+        kcard('Flight-path angle', num(d.burnout.gamma_deg, 1), 'deg'),
+        kcard('Downrange', num(d.burnout.downrange_km, 0), 'km'),
+        kcard('Max q', num(d.max_q.q_kPa, 1), 'kPa at ' + num(d.max_q.t_s, 0) + ' s, Mach ' + num(d.max_q.mach, 2)),
+        kcard('Acceleration at burnout', num(d.burnout.accel_g, 1), 'g'),
+        kcard('Circular speed at burnout altitude', num(d.leo.v_circ_at_burnout_ms, 0), 'm/s'),
+        kcard('Speed shortfall to circular', num(d.leo.deficit_ms, 0), 'm/s'),
+      ]);
+      h += o.bound
+        ? `<p>${pill(o.perigee_km > 100, 'orbital', 'suborbital')} Burnout orbit: perigee ${num(o.perigee_km, 0)} km, apogee ${num(o.apogee_km, 0)} km.</p>`
+        : '<p><span class="pill ok">escape trajectory</span></p>';
+      h += warnList(d.warnings.map((w) => ({ msg: w })));
+      h += '<h5 class="h5">Velocity budget [m/s]</h5>';
+      h +=
+        `<table class="ct"><tr><th>Term</th><th>Value</th><th>Share of ideal</th></tr>` +
+        [
+          ['Ideal ΔV (vacuum Isp, rocket equation)', b.dV_vacuum, 1],
+          ['Back-pressure loss', -b.back_pressure_loss, -b.back_pressure_loss / b.dV_vacuum],
+          ['Gravity loss', -b.gravity_loss, -b.gravity_loss / b.dV_vacuum],
+          ['Drag loss', -b.drag_loss, -b.drag_loss / b.dV_vacuum],
+          ['Inertial speed at burnout', b.net_inertial_speed, b.net_inertial_speed / b.dV_vacuum],
+        ]
+          .map(([n, v, f]) => `<tr><td>${n}</td><td class="n">${num(v, 1)}</td><td class="n">${num(f * 100, 1)} %</td></tr>`)
+          .join('') +
+        `</table><p class="hint">Budget closure residual: ${num(b.closure_residual, 5)} m/s (${num(b.closure_residual_pct, 6)} % of ideal).</p>`;
+      const tt = t.map((p) => p.t);
+      h += '<div class="cae2">';
+      h += box('Altitude [km]', lineChart([{ name: 'altitude', x: tt, y: t.map((p) => p.h / 1e3) }], { xl: 'time [s]', yl: 'km' }));
+      h += box('Speed [m/s]', lineChart([{ name: 'inertial speed', x: tt, y: t.map((p) => p.v) }], { xl: 'time [s]', yl: 'm/s' }));
+      h += box('Dynamic pressure [kPa]', lineChart([{ name: 'q', x: tt, y: t.map((p) => p.q / 1e3) }], { xl: 'time [s]', yl: 'kPa', y0: 0 }));
+      h += box('Flight-path angle [deg]', lineChart([{ name: 'flight-path angle', x: tt, y: t.map((p) => p.gamma) }], { xl: 'time [s]', yl: 'deg' }));
+      h += box('Acceleration [g]', lineChart([{ name: 'net acceleration', x: tt, y: t.map((p) => p.acc_g) }], { xl: 'time [s]', yl: 'g', y0: 0 }));
+      h += '</div>';
+      h +=
+        '<details><summary>Assumptions</summary><ul class="wlist">' +
+        Object.entries(d.assumptions)
+          .map(([k2, v]) => `<li>${esc(k2)}: ${esc(v)}</li>`)
+          .join('') +
+        `<li>pitch-over reached at ${num(d.t_kick_s, 1)} s</li></ul></details>`;
+      $('a_out').innerHTML = h;
+      setStat('a_status', 'done in ' + num(r.ms, 0) + ' ms', 'ok');
+    });
+
+  /* ---------- optimiser ---------- */
+  function scatter(all, front, base, o) {
+    const W = 480,
+      Hh = 300,
+      m = { l: 56, r: 14, t: 18, b: 40 };
+    const xs = all.map((p) => p.mass),
+      ys = all.map((p) => p.isp);
+    let x0 = Math.min(...xs),
+      x1 = Math.max(...xs),
+      y0 = Math.min(...ys),
+      y1 = Math.max(...ys);
+    const px = (x1 - x0) * 0.05 || 1,
+      py = (y1 - y0) * 0.08 || 1;
+    x0 -= px;
+    x1 += px;
+    y0 -= py;
+    y1 += py;
+    const X = (v) => m.l + ((v - x0) / (x1 - x0)) * (W - m.l - m.r),
+      Y = (v) => Hh - m.b - ((v - y0) / (y1 - y0)) * (Hh - m.t - m.b);
+    let g = '';
+    const tk = (lo, hi, n) => {
+      const span = hi - lo,
+        st = Math.pow(10, Math.floor(Math.log10(span / n))) * ([1, 2, 5, 10].find((f) => span / (Math.pow(10, Math.floor(Math.log10(span / n))) * f) <= n) || 10),
+        out = [];
+      for (let v = Math.ceil(lo / st) * st; v <= hi; v += st) out.push(v);
+      return out;
+    };
+    tk(x0, x1, 6).forEach((t) => (g += `<line x1="${X(t)}" x2="${X(t)}" y1="${m.t}" y2="${Hh - m.b}" stroke="#1a1a21"/><text x="${X(t)}" y="${Hh - m.b + 13}" fill="#b1b0b8" font-size="10" text-anchor="middle">${num(t, 0)}</text>`));
+    tk(y0, y1, 5).forEach((t) => (g += `<line y1="${Y(t)}" y2="${Y(t)}" x1="${m.l}" x2="${W - m.r}" stroke="#1a1a21"/><text x="${m.l - 5}" y="${Y(t) + 3}" fill="#b1b0b8" font-size="10" text-anchor="end">${num(t, 0)}</text>`));
+    all.forEach((p) => (g += `<circle cx="${X(p.mass)}" cy="${Y(p.isp)}" r="2.6" fill="${p.feasible ? '#cfd3dc' : '#6b5f7a'}" opacity="${p.feasible ? 0.8 : 0.45}"/>`));
+    if (front.length > 1) g += `<path d="${front.map((p, i) => (i ? 'L' : 'M') + X(p.mass).toFixed(1) + ' ' + Y(p.isp).toFixed(1)).join('')}" fill="none" stroke="#4ade80" stroke-width="1.8"/>`;
+    front.forEach((p) => (g += `<circle cx="${X(p.mass)}" cy="${Y(p.isp)}" r="3.8" fill="#4ade80"/>`));
+    if (base && !base.failed) g += `<path d="M${X(base.mass) - 5} ${Y(base.isp)}h10M${X(base.mass)} ${Y(base.isp) - 5}v10" stroke="#f6ad55" stroke-width="2"/>`;
+    return `<svg viewBox="0 0 ${W} ${Hh}"><rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${Hh - m.t - m.b}" fill="none" stroke="#32323b"/>${g}<text x="${m.l + 6}" y="12" fill="#4ade80" font-size="10.5">Pareto front</text><text x="${m.l + 90}" y="12" fill="#cfd3dc" font-size="10.5">feasible</text><text x="${m.l + 145}" y="12" fill="#6b5f7a" font-size="10.5">violates a limit</text><text x="${m.l + 245}" y="12" fill="#f6ad55" font-size="10.5">+ case as entered</text><text x="${(m.l + W - m.r) / 2}" y="${Hh - 5}" fill="#b1b0b8" font-size="10.5" text-anchor="middle">shell mass proxy [kg]</text><text transform="translate(12 ${(m.t + Hh - m.b) / 2}) rotate(-90)" fill="#b1b0b8" font-size="10.5" text-anchor="middle">delivered Isp [s]</text></svg>`;
+  }
+  function adopt(p) {
+    $('c_pc').value = String(+p.pc.toFixed(1));
+    $('c_eps').value = String(+p.eps.toFixed(2));
+    $('c_of').value = String(+p.of.toFixed(3));
+    document.querySelector('#cae_nav button[data-p="case"]').click();
+    setStat('c_status', 'Pc, eps and O/F set from the optimiser; press Run design');
+  }
+  $('o_run').onclick = () =>
+    guarded('o_run', 'o_status', 'searching, this takes a while', async () => {
+      const input = ST.input || (await getInput());
+      const opts = { Twg_limit_K: val('o_tw') || 800 };
+      if (val('o_dp')) opts.dP_limit_bar = val('o_dp');
+      if (val('o_pl')) opts.pc_lo = val('o_pl');
+      if (val('o_ph')) opts.pc_hi = val('o_ph');
+      if (val('o_el')) opts.eps_lo = val('o_el');
+      if (val('o_eh')) opts.eps_hi = val('o_eh');
+      $('o_prog').hidden = false;
+      $('o_prog').value = 0;
+      const r = await EC.call('opt', { input, opts }, (p) => ($('o_prog').value = p)),
+        d = r.result;
+      ST.opt = d;
+      $('o_prog').hidden = true;
+      const row = (n, p) =>
+        p
+          ? `<tr><td><b>${esc(n)}</b></td><td class="n">${num(p.pc, 1)}</td><td class="n">${num(p.eps, 1)}</td><td class="n">${num(p.of, 2)}</td><td class="n">${num(p.isp, 1)}</td><td class="n">${num(p.mass, 0)}</td><td class="n">${num(p.Twg, 0)}</td><td class="n">${num(p.dP_cool_bar, 1)}</td><td>${pill(p.feasible, 'ok', 'violates')}</td><td><button type="button" data-ad="${esc(n)}">Adopt</button></td></tr>`
+          : '';
+      const pts = { 'Case as entered': d.baseline };
+      let h = `<p>${d.n_evaluations} designs evaluated, ${d.n_feasible} of ${d.n_total} satisfy the limits (hot-wall T up to ${num(d.limits.Twg_max_K, 0)} K, coolant dp up to ${num(d.limits.dP_cool_bar, 1)} bar).</p>`;
+      h += '<table class="ct" id="o_tab"><tr><th>Design</th><th>Pc [bar]</th><th>ε</th><th>O/F</th><th>Isp [s]</th><th>Mass proxy [kg]</th><th>Hot-wall T [K]</th><th>Coolant dp [bar]</th><th>Limits</th><th></th></tr>';
+      const named = [
+        ['Case as entered', d.baseline],
+        ['Max Isp', d.best.isp],
+        ['Min mass', d.best.mass],
+        ['Min wall temperature', d.best.twg],
+      ];
+      named.forEach(([n, p]) => (pts[n] = p));
+      h += named.map(([n, p]) => row(n, p)).join('');
+      d.pareto.forEach((p, i) => {
+        const n = 'Pareto ' + (i + 1);
+        pts[n] = p;
+        h += row(n, p);
+      });
+      h += '</table>';
+      h += '<div class="cae2" style="grid-template-columns:minmax(320px,580px)">' + box('Isp vs shell mass proxy', scatter(d.all, d.pareto, d.baseline)) + '</div>';
+      h += `<p class="hint">${esc(d.method)}</p><p class="hint">${esc(d.mass_basis)}</p>`;
+      $('o_out').innerHTML = h;
+      $('o_out').querySelectorAll('button[data-ad]').forEach((b) => (b.onclick = () => adopt(pts[b.dataset.ad])));
+      setStat('o_status', 'done in ' + num(r.ms / 1e3, 1) + ' s', 'ok');
+    });
+
+  /* ---------- geometry ---------- */
+  let GEO = null,
+    VIEW = { yaw: -0.5, pitch: 0.35, zoom: 1 };
+  const b64ToBytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  function accentRGB() {
+    const s = getComputedStyle(document.body).getPropertyValue('--cu').trim(),
+      m = /^#([0-9a-f]{6})$/i.exec(s);
+    return m ? [0, 2, 4].map((i) => parseInt(m[1].substr(i, 2), 16)) : [180, 160, 120];
+  }
+  function drawView() {
+    if (!GEO) return;
+    const cv = $('g_cv'),
+      ctx = cv.getContext('2d'),
+      W = cv.width,
+      Hh = cv.height;
+    const c = GEO.contour,
+      t = GEO.shell_thickness_mm,
+      sec = +$('g_sec').value,
+      wire = $('g_shade') && $('g_shade').value === 'wire';
+    const SEG = sec === 360 ? 48 : Math.max(12, Math.round((48 * sec) / 360)),
+      a0 = sec === 360 ? 0 : Math.PI,
+      da = (sec * Math.PI) / 180 / SEG;
+    const view = $('g_view').value,
+      yaw = view === 'iso' ? VIEW.yaw : view === 'side' ? 0 : -Math.PI / 2,
+      pitch = view === 'iso' ? VIEW.pitch : 0;
+    const cy = Math.cos(yaw),
+      sy = Math.sin(yaw),
+      cp = Math.cos(pitch),
+      sp = Math.sin(pitch);
+    const x0 = c[0][0],
+      xN = c[c.length - 1][0],
+      xm = (x0 + xN) / 2,
+      Rmax = Math.max(...c.map((p) => p[1])) + t;
+    const xr = Math.abs(xN - x0);
+    const scale = (view === 'axial' ? (0.42 * Hh) / Rmax : Math.min((0.88 * W) / xr, (0.36 * Hh) / Rmax)) * VIEW.zoom;
+    const tf = (x, y, z) => {
+      const X = x - xm;
+      const x1 = X * cy + z * sy,
+        z1 = -X * sy + z * cy;
+      const y2 = y * cp - z1 * sp,
+        z2 = y * sp + z1 * cp;
+      return [W / 2 + x1 * scale, Hh / 2 - y2 * scale, z2];
+    };
+    const ring = (rad, x, k) => {
+      const a = a0 + da * k;
+      return tf(x, rad * Math.cos(a), rad * Math.sin(a));
+    };
+    const inner = c.map((p) => Array.from({ length: SEG + 1 }, (_, k) => ring(p[1], p[0], k))),
+      outer = c.map((p) => Array.from({ length: SEG + 1 }, (_, k) => ring(p[1] + t, p[0], k)));
+    const base = accentRGB(),
+      polys = [];
+    const L = [-0.35, 0.55, 0.75];
+    const add = (P, col, k) => {
+      const u = [P[1][0] - P[0][0], P[1][1] - P[0][1], P[1][2] - P[0][2]],
+        v = [P[2][0] - P[0][0], P[2][1] - P[0][1], P[2][2] - P[0][2]];
+      let nx = u[1] * v[2] - u[2] * v[1],
+        ny = u[2] * v[0] - u[0] * v[2],
+        nz = u[0] * v[1] - u[1] * v[0];
+      const l = Math.hypot(nx, ny, nz) || 1;
+      const lit = Math.abs((-nx * L[0] + ny * L[1] + nz * L[2]) / l);
+      polys.push({ P, z: (P[0][2] + P[1][2] + P[2][2] + P[3][2]) / 4, f: 0.3 + 0.7 * lit, col, k });
+    };
+    for (let i = 0; i < c.length - 1; i++)
+      for (let k = 0; k < SEG; k++) {
+        add([outer[i][k], outer[i][k + 1], outer[i + 1][k + 1], outer[i + 1][k]], base, 1);
+        add([inner[i][k], inner[i][k + 1], inner[i + 1][k + 1], inner[i + 1][k]], base.map((v) => v * 0.62), 2);
+      }
+    if (sec !== 360)
+      [0, SEG].forEach((k) => {
+        for (let i = 0; i < c.length - 1; i++) add([inner[i][k], outer[i][k], outer[i + 1][k], inner[i + 1][k]], [235, 235, 240], 3);
+      });
+    polys.sort((a, b) => a.z - b.z);
+    ctx.clearRect(0, 0, W, Hh);
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, Hh);
+    polys.forEach((p) => {
+      ctx.beginPath();
+      ctx.moveTo(p.P[0][0], p.P[0][1]);
+      for (let i = 1; i < 4; i++) ctx.lineTo(p.P[i][0], p.P[i][1]);
+      ctx.closePath();
+      if (wire) {
+        ctx.strokeStyle = 'rgba(' + p.col.map(Math.round).join(',') + ',0.55)';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      } else {
+        const col = p.col.map((v) => Math.min(255, Math.round(v * p.f)));
+        ctx.fillStyle = 'rgb(' + col.join(',') + ')';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(' + col.join(',') + ',0.9)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    });
+    ctx.fillStyle = '#cfcdd2';
+    ctx.font = '11px sans-serif';
+    [
+      ['injector face', x0],
+      ['throat', 0],
+      ['exit lip', xN],
+    ].forEach(([n, x]) => {
+      const q = tf(x, 0, 0);
+      ctx.fillRect(q[0] - 2, q[1] - 2, 4, 4);
+      ctx.fillText(n, q[0] + 5, q[1] - 6);
+    });
+  }
+  function dl(name, data, type) {
+    const u = URL.createObjectURL(new Blob([data], { type }));
+    return `<a href="${u}" download="${esc(name)}" style="color:var(--hi)">${esc(name)}</a>`;
+  }
+  $('g_run').onclick = () =>
+    guarded('g_run', 'g_status', 'building geometry', async () => {
+      const input = ST.input || (await getInput());
+      const r = await EC.call('export', { input, opts: { n: val('g_n') || 160 } }),
+        d = r.result;
+      GEO = d;
+      ST.geo = d;
+      const stl = b64ToBytes(d.stl_base64);
+      let h = '<canvas id="g_cv" width="720" height="400" style="width:100%;max-width:720px;border:1px solid var(--line);border-radius:5px;cursor:grab;touch-action:none"></canvas>';
+      h += '<div class="lact" style="margin-top:6px"><label>Shading<select id="g_shade"><option value="solid">Shaded</option><option value="wire">Wireframe</option></select></label><span class="hint">Drag to rotate in the isometric view, scroll to zoom.</span></div>';
+      h += cards([
+        kcard('Length', num(d.length_mm, 0), 'mm'),
+        kcard('Throat diameter', num(d.throat_dia_mm, 1), 'mm'),
+        kcard('Exit diameter', num(d.exit_dia_mm, 1), 'mm'),
+        kcard('Shell thickness', num(d.shell_thickness_mm, 2), 'mm'),
+        kcard('STL triangles', d.stl_triangles, ''),
+      ]);
+      h +=
+        '<h5 class="h5">Downloads</h5><p>' +
+        [
+          dl(d.name + '_contour.csv', d.csv, 'text/csv'),
+          dl(d.name + '_solidworks_curve.txt', d.solidworks, 'text/plain'),
+          dl(d.name + '_cadquery.py', d.cadquery, 'text/x-python'),
+          dl(d.name + '_shell.stl', stl, 'model/stl'),
+        ].join(' | ') +
+        '</p><p class="hint">Coordinates are in mm with the throat at x = 0. The SolidWorks file is an x, y, z list for Insert > Curve > Through XYZ Points. Running the CadQuery script writes chamber.step.</p>';
+      $('g_out').innerHTML = h;
+      const cv = $('g_cv');
+      let drag = null;
+      cv.onpointerdown = (e) => {
+        drag = [e.clientX, e.clientY];
+        cv.setPointerCapture(e.pointerId);
+        cv.style.cursor = 'grabbing';
+      };
+      cv.onpointerup = () => {
+        drag = null;
+        cv.style.cursor = 'grab';
+      };
+      cv.onpointermove = (e) => {
+        if (!drag) return;
+        VIEW.yaw += (e.clientX - drag[0]) * 0.01;
+        VIEW.pitch = Math.max(-1.4, Math.min(1.4, VIEW.pitch + (e.clientY - drag[1]) * 0.01));
+        drag = [e.clientX, e.clientY];
+        requestAnimationFrame(drawView);
+      };
+      cv.onwheel = (e) => {
+        e.preventDefault();
+        VIEW.zoom = Math.max(0.4, Math.min(4, VIEW.zoom * (e.deltaY < 0 ? 1.1 : 0.91)));
+        requestAnimationFrame(drawView);
+      };
+      ['g_sec', 'g_view', 'g_shade'].forEach((id) => ($(id).onchange = drawView));
+      drawView();
+      setStat('g_status', 'done in ' + num(r.ms, 0) + ' ms', 'ok');
+    });
+  $('g_sec').onchange = drawView;
+  $('g_view').onchange = drawView;
+
+  /* ---------- traceability ---------- */
+  $('x_run').onclick = () =>
+    guarded('x_run', 'x_status', 'loading', async () => {
+      if (!ST.env) throw new Error('run a design on the Case tab first');
+      const r = await EC.call('trace', {}),
+        T = r.result,
+        env = ST.env,
+        p = (env.result && env.result.perf) || {};
+      const inpTxt = JSON.stringify(env.request.input);
+      let h = `<table class="ct"><tr><th>Run record</th><th></th></tr><tr><td>Input hash</td><td><code>${esc(env.request.input_hash)}</code></td></tr><tr><td>Result hash</td><td><code>${esc(env.provenance.result_hash)}</code></td></tr><tr><td>Engine version</td><td>${esc(env.engine.version)}</td></tr>`;
+      Object.entries(env.provenance.tables || {}).forEach(([k, v]) => (h += `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`));
+      h += '</table>';
+      h += '<table class="ct"><tr><th>Output</th><th>Value</th><th>Source</th><th>Governing relation</th><th>Reference</th><th>Depends on</th></tr>';
+      T.forEach((t) => {
+        const v = p[t.key];
+        h += `<tr><td><b>${esc(t.label)}</b></td><td class="n">${typeof v === 'number' ? num(v, 4) + ' <i>' + esc(t.unit || '') + '</i>' : '–'}</td><td>${statusPill(t.kind)}</td><td>${esc(t.eq)}</td><td>${esc(t.ref)}</td><td>${esc(t.deps.join(', '))}</td></tr>`;
+      });
+      h += '</table>';
+      h += '<p class="hint">LIVE: computed from the inputs on each run. TABLE: read from tables made offline with NASA CEA, Cantera or CoolProp. ASSUMED: a default or input that is not computed.</p>';
+      $('x_out').innerHTML = h;
+      setStat('x_status', 'done', 'ok');
+    });
 })();
 </script>
 </body></html>
